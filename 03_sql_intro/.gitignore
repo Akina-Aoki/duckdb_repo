@@ -1,0 +1,5 @@
+
+# duckdb longfiles that will be ctreated when changing the database.
+# Ignore these version controls.
+*.wal
+*.duckdb
