@@ -1,65 +1,145 @@
-# Setting up the DuckDB database file
+# Filtering and Exploring Data in SQL (DuckDB)
 
-Let’s switch to the terminal and initialize a new DuckDB database named `jokes.duckdb`:
-```python
-duckdb -ui jokes.duckdb
-```
-Once you’re in the DuckDB shell, run a simple command (for example, DESC;) so that the database is saved to disk. 
-After this step, you’ll see a file called `jokes.duckdb` created in your directory.
+This reference provides essential SQL filtering techniques using a basic jokes dataset in DuckDB. Key SQL commands are applied for data exploration, analysis, and manipulation with a focus on clarity and best practices for beginners.
 
-```python
-CREATE TABLE funny_jokes (
-    id INTEGER PRIMARY KEY,
-    joke_text VARCHAR,
-    rating INTEGER
-);
-```
-This statement is part of SQL’s Data Definition Language (DDL). It creates a table named funny_jokes with three columns:
+---
 
-`id` — an integer that acts as the primary key
-
-`joke_text` — the actual joke stored as text
-
-`rating` — a numeric value indicating how funny the joke is
-
-## Inserting Data
-Now let’s add some jokes into the table:
-```python
-INSERT INTO funny_jokes (id, joke_text, rating) VALUES
-(1, 'Why don’t scientists trust atoms? Because they make up everything!', 8),
-(2, 'Why did the scarecrow win an award? Because he was outstanding in his field!', 7),
-(3, 'I told my wife she was drawing her eyebrows too high. She looked surprised.', 9),
-(4, 'Why don’t skeletons fight each other? They don’t have the guts.', 6);
+## Project Structure
 
 ```
-You can verify the insert worked by checking the contents of the table:
+03_sql_intro/
+   ├─ sql/
+   │    ├─ create_table.sql      # Table definition for `funny_jokes`
+   │    ├─ insert_jokes.sql      # Sample data for `funny_jokes`
+   │    ├─ queries.sql           # Filtering and ordering queries
+   │    ├─ update_joke.sql       # Example data updates
+   │    ├─ delete.sql            # Filtering and deleting records
+   ├─ .gitignore                 # Ignore DuckDB files
+   └─ README.md                  # This overview
 ```
-SELECT * FROM funny_jokes;
-```
-The table is stored in the default schema called main. Schemas in DuckDB are like folders — they organize tables and related database objects under a common namespace.
 
-## Describing Database Objects
-To inspect what’s inside the database, use the `DESC` command:
-```
-DESC;
-```
-This displays available schemas and confirms that main is the default one.
-You can also describe a specific table:
-```
-DESC funny_jokes;
-DESC main.funny_jokes;
-```
-Both commands return the same details about your table’s structure.
+---
 
-## Adding more jokes
-Let’s expand the table with more entries:
-```
-INSERT INTO funny_jokes (id, joke_text, rating) VALUES
-(5, 'Why don’t some couples go to the gym? Because some relationships don’t work out.', 8),
-(6, 'I would avoid the sushi if I were you. It’s a little fishy.', 7),
-(7, 'Want to hear a joke about construction? I’m still working on it.', 6),
-(8, 'Why don’t programmers like nature? It has too many bugs.', 9),
-(9, 'How does a penguin build its house? Igloos it together.', 1),
-(10, 'A Gothenburg person queues for Star Wars tickets. When someone cuts in line, he says "Ge daj!"', 2);
+## Dataset: `funny_jokes`
 
+The dataset consists of the `funny_jokes` table, designed for concise practice and demonstration.
+
+**Columns:**
+- `id`: INTEGER – Unique identifier for each entry (Primary Key)
+- `joke_text`: VARCHAR – Joke content
+- `rating`: INTEGER – Numerical rating of humor quality (higher indicates more humorous)
+
+Table schema and sample data are available in [`create_table.sql`](sql/create_table.sql) and [`insert_jokes.sql`](sql/insert_jokes.sql).
+
+---
+
+## Key SQL Filtering and Analysis Concepts
+
+### 1. Basic Filtering with `WHERE`
+
+The `WHERE` clause restricts returned rows based on specified boolean conditions.
+
+**Example:**  
+Return all jokes with a rating of 8 or higher:
+```sql
+SELECT * FROM funny_jokes WHERE rating >= 8;
 ```
+
+### 2. Multiple Conditions
+
+Combine logic conditions using `AND` and `OR`.
+
+**Example:**  
+Display jokes with ratings between 7 and 9:
+```sql
+SELECT * FROM funny_jokes WHERE rating >= 7 AND rating <= 9;
+```
+
+### 3. Sorting Results using `ORDER BY`
+
+Order query outputs numerically or alphabetically for better pattern recognition.
+
+**Ascending order:**
+```sql
+SELECT * FROM funny_jokes ORDER BY rating;
+```
+**Descending order:**
+```sql
+SELECT * FROM funny_jokes ORDER BY rating DESC;
+```
+
+### 4. Filtering for Specific Records
+
+Target individual records using column equality.
+
+**Example:**  
+Isolate the row for `id = 7`:
+```sql
+SELECT * FROM funny_jokes WHERE id = 7;
+```
+
+### 5. Preview Before Deleting (Safe Delete Patterns)
+
+Execute a `SELECT` statement with the desired `WHERE` condition before performing a `DELETE` for validation.
+
+**Preview rows to be deleted:**
+```sql
+SELECT * FROM funny_jokes WHERE rating < 5;
+```
+**Delete those rows:**
+```sql
+DELETE FROM funny_jokes WHERE rating < 5;
+```
+
+---
+
+## Updating Data
+
+Values in table entries can be modified using `UPDATE` statements.
+
+**Example:**  
+Increase the rating for the row with `id = 7` to 10:
+```sql
+UPDATE funny_jokes
+SET rating = 10
+WHERE id = 7;
+```
+
+---
+
+## Best Practices
+
+- Always preview affected rows using `SELECT` before running `UPDATE` or `DELETE`.
+- Use `ORDER BY` to clarify data structure and reveal value distribution.
+- Ensure unique `id` assignment as primary key in each row.
+- Utilize aggregate functions to summarize data.  
+    **Example:**  
+    ```sql
+    SELECT COUNT(*) AS total_jokes FROM funny_jokes;
+    ```
+- Apply simple pattern searches for text content.  
+    **Example:**  
+    ```sql
+    SELECT * FROM funny_jokes WHERE joke_text LIKE '%penguin%';
+    ```
+
+---
+
+## Code Reference
+
+- Table creation: `sql/create_table.sql`
+- Sample inserts: `sql/insert_jokes.sql`
+- Filtering, ordering, lookup queries: `sql/queries.sql`
+- Record updates: `sql/update_joke.sql`
+- Row preview and deletion: `sql/delete.sql`
+
+---
+
+## References
+
+- [DuckDB SQL Reference – WHERE](https://duckdb.org/docs/sql/statements/select.html#where-clause)
+- [DuckDB SQL Reference – UPDATE](https://duckdb.org/docs/sql/statements/update.html)
+- [DuckDB SQL Reference – DELETE](https://duckdb.org/docs/sql/statements/delete.html)
+- [Beginner SQL Tutorial](https://www.sqlcourse.com/)
+
+---
