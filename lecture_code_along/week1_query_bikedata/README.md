@@ -1,4 +1,4 @@
-# DuckDB Ingestion Pipeline — Learning Log & Repeatable Playbook
+# DuckDB Ingestion Pipeline: Learning Log & Repeatable Playbook
 
 A reusable operational workflow for loading CSV assets into DuckDB with zero surprises.
 
@@ -41,7 +41,7 @@ project/
 If this structure is not aligned with my working directory, ingestion won’t behave.
 
 ## 3. Execution Workflow (The Playbook)
-### Step 1 — Navigate into the correct directory
+### Step 1: Navigate into the correct directory
 
 This ensures DuckDB can resolve the CSV paths.
 ```bash
@@ -57,7 +57,7 @@ bike_data.duckdb (optional)
 ```
 If I don’t see all three → I'm in the wrong folder.
 
-### Step 2 — Execute the ingestion script
+### Step 2: Execute the ingestion script
 
 This creates the staging schema and loads all CSVs.
 
@@ -66,12 +66,12 @@ duckdb bike_data.duckdb < sql/ingest_bike.sql
 ```
 This guarantees ingestion runs inside the intended database file.
 
-### Step 3 — Open DuckDB UI from the same folder
+### Step 3: Open DuckDB UI from the same folder
 ```nginx
 duckdb bike_data.duckdb -ui
 ```
 
-### Step 4 — Validate that schema creation worked
+### Step 4: Validate that schema creation worked
 ```sql
 SELECT schema_name FROM information_schema.schemata;
 ```
@@ -87,7 +87,7 @@ pg_catalog
 
 If staging is missing → ingestion never executed in this database file.
 
-### Step 5 — Validate that tables were created
+### Step 5: Validate that tables were created
 ``` sql
 SELECT table_schema, table_name
 FROM information_schema.tables
@@ -95,7 +95,7 @@ ORDER BY table_schema, table_name;
 ```
 Expect the number pf files under `staging`
 
-### Step 6 — Validate row ingestion
+### Step 6: Validate row ingestion
 If it returns a number > 0, data landed correctly.
 ```sql
 SELECT COUNT(*) FROM staging.brands;
@@ -112,7 +112,7 @@ Relative paths break, tables load empty, schema doesn’t appear.
 The left panel in DuckDB UI is not the source-of-truth.
 Always verify through:
 
-``information_schema.schemata`
+`information_schema.schemata`
 
 `information_schema.tables`
 
@@ -137,7 +137,7 @@ If my script says:
 
 ## 5. Lessons Learned
 
-Schema creation is not the issue — execution context is.
+Schema creation is not the issue and the execution context is.
 
 DuckDB is silent when paths are wrong, so visibility checks are critical.
 
@@ -146,3 +146,7 @@ Once everything is aligned, DuckDB is extremely efficient and fast.
 Building a repeatable “staging ingestion” workflow is core Data Engineering muscle memory.
 
 This process will repeat in nearly every project: Kaggle datasets, ETL prototypes, personal pipelines, or production-style workloads in your portfolio.
+
+## Reference
+[CSV Import](https://duckdb.org/docs/stable/guides/file_formats/csv_import)
+[DuckDB Join Operations Guide](https://duckdb.org/docs/stable/guides/performance/join_operations)

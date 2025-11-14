@@ -16,76 +16,68 @@ CREATE TABLE
 
 
 CREATE TABLE
-    IF NOT EXISTS staging.categories AS ( -- create a table named categories in staging schema
+    IF NOT EXISTS staging.categories AS ( 
         SELECT
             *
         FROM
-            read_csv_auto ('data/categories.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/categories.csv') 
     );
 
 
 CREATE TABLE
-    IF NOT EXISTS staging.customers AS ( -- create a table named customers in staging schema
+    IF NOT EXISTS staging.customers AS (
         SELECT
             *
         FROM
-            read_csv_auto ('data/customers.csv')  -- specify the path to the csv file
-    );
-
-CREATE TABLE
-    IF NOT EXISTS staging.joined_table AS ( -- create a table named joined_table in staging schema
-        SELECT
-            *
-        FROM
-            read_csv_auto ('data/joined_table.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/customers.csv') 
     );
 
 
 CREATE TABLE
-    IF NOT EXISTS staging.order_items AS ( -- create a table named order_items in staging schema
+    IF NOT EXISTS staging.order_items AS (
         SELECT
             *
         FROM
-            read_csv_auto ('data/order_items.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/order_items.csv') 
     );
 
 
 CREATE TABLE
-    IF NOT EXISTS staging.orders AS ( -- create a table named orders in staging schema
+    IF NOT EXISTS staging.orders AS (
         SELECT
             *
         FROM
-            read_csv_auto ('data/orders.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/orders.csv')
     );
 
 CREATE TABLE
-    IF NOT EXISTS staging.products AS ( -- create a table named products in staging schema
+    IF NOT EXISTS staging.products AS ( 
         SELECT
             *
         FROM
-            read_csv_auto ('data/products.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/products.csv') 
     );
 
 CREATE TABLE
-    IF NOT EXISTS staging.staffs AS ( -- create a table named staffs in staging schema
+    IF NOT EXISTS staging.staffs AS ( 
         SELECT
             *
         FROM
-            read_csv_auto ('data/staffs.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/staffs.csv')  
     );
 
 CREATE TABLE
-    IF NOT EXISTS staging.stocks AS ( -- create a table named stocks in staging schema
+    IF NOT EXISTS staging.stocks AS (
         SELECT
             *
         FROM
-            read_csv_auto ('data/stocks.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/stocks.csv')
     );
 
 CREATE TABLE
-    IF NOT EXISTS staging.stores AS ( -- create a table named stores in staging schema
+    IF NOT EXISTS staging.stores AS (
         SELECT
             *
         FROM
-            read_csv_auto ('data/stores.csv')  -- specify the path to the csv file
+            read_csv_auto ('data/stores.csv') 
     );

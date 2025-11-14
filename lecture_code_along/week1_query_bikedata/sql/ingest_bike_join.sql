@@ -11,5 +11,8 @@ CREATE TABLE
         SELECT
             *
         FROM
-            read_csv_auto ('data/joined_table.csv')  -- specify the path to the csv file
+            read_csv_auto('data/joined_table.csv')
+
     );
+-- produce a new duckdb from this called "bike_join"
+-- run in terminal: $ duckdb bike_join.duckdb < sql/ingest_bike_join.sql
