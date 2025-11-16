@@ -8,6 +8,9 @@ to start my ui:
 =============================
 Query the data
 ============================= */
+--in ui confirm tables
+SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema = 'staging';
+
 -- overview of * data
 desc;
 

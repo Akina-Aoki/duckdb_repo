@@ -1,4 +1,7 @@
 /*Create a schema and table to ingest bike data from csv files in one command line
+duckdb bike.duckdb < sql/ingest_bike.sql - create staging tables in DUCKDB
+duckdb -ui bike.duckdb - Open DUCKDB in UI mode
+in ui confirm tables, SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema = 'staging'; 
 
 */
 
