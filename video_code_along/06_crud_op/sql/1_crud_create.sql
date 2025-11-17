@@ -9,6 +9,7 @@ VALUES
         'request made to a database to retrieve, modify or manipulate data'
     );
 
+-- show the data in database.sql table
 FROM
     database.sql;
 
@@ -23,6 +24,7 @@ VALUES
 	('CRUD', 'create, read, update, delete - basic actions to be performed on data'),
 	('range condition', 'filter data within a specific range of values');
 
+-- show the data in database.sql table
 FROM database.sql; -- view data in database.sql table
 
 
