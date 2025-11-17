@@ -32,7 +32,7 @@
 ## 2. [ingest_bike.sql](https://github.com/Akina-Aoki/duckdb_repo/blob/main/lecture_code_along/week1_query_bikedata/sql/ingest_bike.sql)
 
 **What I did & Why:**  
-"After experimenting, I built a proper ingestion pipeline that mirrors best practices for analytics engineering. Instead of one big table, I ingested each CSV as a staging table. This approach better reflects a normalized, flexible database and helps catch schema mismatches early."
+" I built a proper ingestion pipeline that mirrors best practices for analytics engineering. Instead of one big table, I ingested each CSV as a staging table. This approach better reflects a normalized, flexible database and helps catch schema mismatches early."
 
 **What to show & say:**  
 - Open `ingest_bike.sql`
@@ -46,7 +46,7 @@
 - "I repeat this for every major data file: categories, customers, order_items, orders, products, staffs, stocks, stores."
 
 **Ingest/Create Your Staging Tables**
-- duckdb bike.duckdb < sql/ingest_bike.sql
+- duckdb bike_data.duckdb < sql/ingest_bike.sql
 - duckdb -ui bike.duckdb
 
 - In the UI, run:
@@ -62,35 +62,14 @@
 
 ## 3. [join_tables.sql](https://github.com/Akina-Aoki/duckdb_repo/blob/main/lecture_code_along/week1_query_bikedata/sql/join_tables.sql)
 
-**What I did & Why:**  
-"Next, I wanted to create a fully joined table for richer analytics. I wrote one big query to LEFT JOIN all the staging tables by their key columns. This lets me consolidate all info about orders, customers, products, etc. into one denormalized result."
 
-**What to show & say:**  
-- Open `join_tables.sql`.
-- Show the actual LEFT JOIN code, and mention:
-    "I alias tables—`o` for orders, `c` for customers, `oi` for order_items, etc.—to make the joins readable. Each join is designed so that missing data (like an order with no items) still appears, thanks to the LEFT JOIN."
-- "One common issue to watch for: typos in table names. Here I accidentally used `orders_items` instead of `order_items`—always double check these!"
-
-**In the UI, run a join query (after fixing any typos if needed), for example:**
-    ```sql
-    SELECT o.order_id, o.order_date, c.first_name AS customer_first_name, p.product_name, b.brand_name
-    FROM staging.orders o
-    LEFT JOIN staging.customers c ON o.customer_id = c.customer_id
-    LEFT JOIN staging.order_items oi ON o.order_id = oi.order_id
-    LEFT JOIN staging.products p ON oi.product_id = p.product_id
-    LEFT JOIN staging.brands b ON p.brand_id = b.brand_id
-    LIMIT 10;
-    ```
-
-**Why:**  
-"Doing complex joins yourself is excellent practice for understanding how real database relationships work—and this lays the foundation for creating analytic tables you’ll use throughout the course."
 
 ---
 
 ## 4. [ingest_bike_join.sql](https://github.com/Akina-Aoki/duckdb_repo/blob/main/lecture_code_along/week1_query_bikedata/sql/ingest_bike_join.sql)
 
 **What I did & Why:**  
-"In addition to joining tables on the fly, I also prepared a fully joined CSV. Ingesting this as `staging.joined_table` makes it easy to jump right into analytics for demos and learning."
+" I also have ingesting this as `staging.joined_table` makes it easy to jump right into analytics for demos and learning."
 
 **What to show & say:**  
 - Open `ingest_bike_join.sql`.
@@ -169,17 +148,5 @@
 
 **Outro:**  
 "That’s the whole journey from raw CSVs to advanced queries in DuckDB. Practicing these steps gives you reliable skills for data engineering, analytics, and portfolio projects. Thanks for following along!"
-
----
-
-## [Side-by-Side Reference Table]
-
-| Step                      | File/Action to Show                                                                | Example in UI                              |
-|---------------------------|------------------------------------------------------------------------------------|--------------------------------------------|
-| Create table (explore)    | create_table.sql                                                                   | CREATE TABLE IF NOT EXISTS bike_data ...   |
-| Ingest all staging tables | ingest_bike.sql                                                                    | CREATE TABLE IF NOT EXISTS staging.* ...   |
-| Join normalized tables    | join_tables.sql                                                                    | Full LEFT JOIN query                       |
-| Ingest denormalized table | ingest_bike_join.sql                                                               | CREATE TABLE IF NOT EXISTS staging.joined_table ... |
-| Query & analytics         | query_bike.sql                                                                     | Various queries: SELECT, CASE, joins, etc. |
 
 ---
