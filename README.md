@@ -14,3 +14,8 @@ Another part of this project was learning how to organize my work with Git and G
 
 🧠 Purpose
 This project is part of my ongoing effort to build a strong foundation in data engineering. It’s not just about writing SQL queries—it’s about learning how the tools connect and how data moves from raw files to meaningful insights.
+
+
+
+https://github.com/user-attachments/assets/b3f62667-0c71-4949-9898-9cc91a2a743b
+
