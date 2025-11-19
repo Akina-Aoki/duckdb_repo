@@ -1,11 +1,7 @@
-
-https://github.com/user-attachments/assets/81a0da0f-c792-4f56-844b-5c390cb2245e
 # DuckDB Ingestion Pipeline: Learning Log & Repeatable Playbook
 
 
 https://github.com/user-attachments/assets/1ab9e381-e05b-4b80-9e4d-dba58f8f1e2d
-
-
 
 A reusable operational workflow for loading CSV assets into DuckDB with zero surprises.
 
