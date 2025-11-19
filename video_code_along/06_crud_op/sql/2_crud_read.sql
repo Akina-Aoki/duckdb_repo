@@ -1,6 +1,6 @@
 -- R in CRUDE: Read values
 -- Query to read all records from the specified tables
-
+-- pull data out of the tables
 SELECT * 
 
 FROM programming.python;
