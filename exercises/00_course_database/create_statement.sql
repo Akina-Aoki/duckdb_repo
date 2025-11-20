@@ -34,26 +34,17 @@ FROM
     pg_catalog.pg_sequences;
 
 
+/*3) creating sql tables and columns (id, week, content, content_type, exercise) in database schema*/
 
-/*
-3) creating sql tables and columns (id, week, content, content_type, exercise) in database schema
-
-NULL::STRING =
-Add the new column, set old rows to empty, and guarantee the correct data type.
- */
--- Correction: creating a new table
-CREATE TABLE database.sql_course_table2 AS
-  SELECT
-    id, 
-    week,
-    content,
-    NULL::STRING AS description,
-    content_type,
-    exercise
-  FROM
-    database.sql_course_table;
-
+CREATE TABLE database.sql_course_table(
+id INTEGER,
+week INTEGER,
+content VARCHAR,
+description VARCHAR,
+content_type VARCHAR,
+exercise VARCHAR
+);
 
 -- verify table creation
-DESC database.sql_course_table2;
+DESC database.sql_course_table;
 
