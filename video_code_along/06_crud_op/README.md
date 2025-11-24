@@ -1,6 +1,6 @@
 # 06_crud_op – CRUD Operations SQL Code Along
 ## Video Learning Logs
-[![R in Crud Operations](https://img.youtube.com/vi/eggHjrB-dgU/0.jpg)](https://youtu.be/eggHjrB-dgU)
+[![R in Crud Operations](https://img.youtube.com/vi/eggHjrB-dgU/0.jpg)](https://youtu.be/eggHjrB-dgU) <br>
 [CRUD Operations: glossary data](https://youtu.be/prMSzEULIzw)
 
 
