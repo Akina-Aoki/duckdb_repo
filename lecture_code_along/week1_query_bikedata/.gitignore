@@ -1,0 +1,6 @@
+#vscode
+.vscode 
+
+# duckdb
+*.wal
+*.duckdb

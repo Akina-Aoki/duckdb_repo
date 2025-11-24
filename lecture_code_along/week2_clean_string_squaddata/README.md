@@ -16,6 +16,62 @@ Find rows that do not contain the *title* column value in the *context* column v
 ## Task 3
 Find rows that start with *title* column value in the *context* column value.
 
+Breakdown:
+
+context
+
+This is the long text field where the reading passage lives.
+
+title
+
+This is the shorter text that describes or summarizes the passage.
+
+LENGTH(title)
+
+This calculates how many characters are in the title.
+
+Example:
+
+If title = 'School Life' → LENGTH(title) = 11 characters (including the space).
+
+SUBSTR(context, 1, LENGTH(title))
+
+SUBSTR = “substring”, meaning “take part of the text.”
+
+The arguments are:
+
+context → which text to cut from.
+
+1 → start position. Here it means start at the first character of context.
+
+LENGTH(title) → how many characters to take.
+
+So this means:
+“Take the first N characters of context, where N is the length of title.”
+
+Example:
+
+title = 'School Life'
+
+context = 'School Life is very different in Japan...'
+
+LENGTH(title) = 11
+
+SUBSTR(context, 1, 11) = 'School Life'
+
+SUBSTR(context, 1, LENGTH(title)) = title
+
+Now we compare:
+“Are the first N characters of context exactly equal to title?”
+
+If yes → the row matches and is returned.
+
+If not → the row is filtered out.
+
+So the full WHERE line means:
+
+“Keep only the rows where the context text starts with the exact same characters as the title value.”
+
 ## Task 4
 Create a new column which is the first answer of the AI model. Do not use pattern matching in your query.
 
