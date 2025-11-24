@@ -1,5 +1,6 @@
 # 06_crud_op – CRUD Operations SQL Code Along
-[![Watch the video](https://img.youtube.com/vi/eggHjrB-dgU/maxresdefault.jpg)](https://youtu.be/eggHjrB-dgU)
+[![Watch the video](https://img.youtube.com/vi/eggHjrB-dgU/hqdefault.jpg)](https://youtu.be/eggHjrB-dgU)
+
 
 
 A walkthrough for basic SQL `CRUD` (Create, Read, Update, Delete) operations using DuckDB, covering workflow, terminology, and practical examples. This README summarizes essential patterns and references for both learning and quick review.
