@@ -1,5 +1,6 @@
 # 06_crud_op – CRUD Operations SQL Code Along
-[![Watch the video](https://img.youtube.com/vi/eggHjrB-dgU/hqdefault.jpg)](https://youtu.be/eggHjrB-dgU)
+[![YouTube Thumbnail](https://img.youtube.com/vi/eggHjrB-dgU/0.jpg)](https://youtu.be/eggHjrB-dgU)
+
 
 
 
