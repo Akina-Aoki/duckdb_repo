@@ -1,5 +1,8 @@
 # 07 – Aggregation & GROUP BY in DuckDB
 
+## Video learning log
+[Group by: eda food data](https://youtu.be/HfMeLVcC4Cw)
+
 A walkthrough of data aggregation techniques using SQL’s `GROUP BY`, on a real dataset of Google food searches.  
 This readme summarizes the project structure, key aggregation concepts, and practical SQL examples to support fast learning and review.
 
