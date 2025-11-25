@@ -106,3 +106,59 @@ to_timestamp(sunsetTime) AT TIME ZONE 'Europe/Stockholm' AS sunset_utc_swedentim
 
 FROM staging.weather
 WHERE "Country/Region" = 'Sweden'; -- note the use of single quotations
+
+
+/*
+## Task 5
+For each year-month, show the largest gap between sunrise and sunset hours. In your result, show these columns:
+- year
+- month
+- the time with time zone of sunrise when the gap is largest in that month (MAX)
+- the time with time zone of sunset when the gap is largest in that month (MAX)
+- the gap in hours
+
+step 1: the new year and month columns involves subtracting a part of timestamp
+step 2: to query the date with the largest gap, we need to use aggregation function MAX
+*/
+
+SELECT
+  date_part('year', to_timestamp(sunriseTime)) AS year,
+  date_part('month', to_timestamp(sunriseTime)) AS month,
+
+  ROUND(MAX(sunsetTime-sunriseTime)/3600,2) AS gap_hours -- divide 3600 to show gap in hours
+
+FROM staging.weather
+WHERE "Country/Region" = 'Sweden'
+GROUP BY year, month
+ORDER BY year, month
+
+
+/*
+## Task 6
+Show a new column which prints a text of warning, 'It's dangerous to use the crane at kl. ...', where ... is the hour of windGustTime during the day. For instance, the result of one row can be: 'It's dangerous to use the crane at kl. 16'
+*/
+
+-- concatenate integer and string
+-- the windiest timestamp in a day in Sweden
+SELECT
+to_timestamp(windGustTime) AT TIME ZONE 'Europe/Stockholm' AS most_windy_timestamp,
+date_part('hour', most_windy_timestamp) AS most_windy_hour,
+CONCAT('It''s dangerous to use the crane at kl.', most_windy_hour)
+
+FROM
+  staging.weather
+WHERE "Country/Region" = 'Sweden';
+
+
+-- concat string and string
+SELECT
+to_timestamp(windGustTime) AT TIME ZONE 'Europe/Stockholm' AS most_windy_timestamp,
+-- string format time: strftime() transforms timestamps to string
+-- use the format, like %H, to design the presentation
+-- string past time: strptime() transform string to timestamp
+strftime(most_windy_timestamp, '%H') AS most_windy_hour,
+CONCAT('It''s dangerous to use the crane at kl.', most_windy_hour) AS hour_warning
+
+FROM
+  staging.weather
+WHERE "Country/Region" = 'Sweden';

@@ -7,7 +7,6 @@ You are asked to create a database with:
 STEPS:
 adelo@Aira MINGW64 ~/de25/aira_sql/lecture_code_along/week2_clean_string_squaddata (main)
 $ duckdb squad_data.duckdb < sql/create_squad.sql
-
 duckdb -ui squad_data.duckdb
 */
 

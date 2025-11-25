@@ -1,4 +1,4 @@
-# In-class exercise, week 4
+# In-class exercise, week 3
 This exercise covers knowledge in chapter 9 and previous chapters. The background is that you are a data engineer in a construction company. This company will start analyzing weather data together with other operational data in order to understand how weather has affected its operation, like project delays, material damages and safety risks etc. With these insights, the company can plan ahead based on weather forecasts. 
 
 Your manager wants you to show some EDA from a sample weather data to understand what can be analyzed from weather data, before adding weather data to the existing database with other operational data. 
