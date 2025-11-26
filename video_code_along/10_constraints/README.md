@@ -45,6 +45,5 @@ This short folder shows how to enforce rules on table columns using constraints 
 - Use DEFAULT for convenient, consistent values.
 
 References  
-[alter table]: https://duckdb.org/docs/sql/alter_table  
 [constraints]: https://duckdb.org/docs/stable/sql/constraints  
-[create table]: https://duckdb.org/docs/sql/create_table
+
