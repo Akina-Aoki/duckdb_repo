@@ -45,8 +45,8 @@ This short folder shows how to enforce rules on table columns using constraints 
 - Use DEFAULT for convenient, consistent values.
 
 References  
-[constraints]: https://duckdb.org/docs/stable/sql/constraints
-[constraints]: https://www.geeksforgeeks.org/sql/sql-constraints/
-[constraints]: https://www.w3schools.com/sql/sql_constraints.asp
-[alter]: https://duckdb.org/docs/stable/sql/statements/alter_table
+[constraints]: https://duckdb.org/docs/stable/sql/constraints <br>
+[constraints]: https://www.geeksforgeeks.org/sql/sql-constraints/ <br>
+[constraints]: https://www.w3schools.com/sql/sql_constraints.asp <br>
+[alter]: https://duckdb.org/docs/stable/sql/statements/alter_table <br>
 
