@@ -141,7 +141,7 @@ WHERE monthly_salary_in_sek = 666667;
 
 -- Add a new column for salary_level
 ALTER TABLE staging.cleaned_salaries
-ADD COLUMN salary_level INTEGER;
+ADD COLUMN salary_level VARCHAR;
 
 -- populate the salary_level column
 UPDATE staging.cleaned_salaries
@@ -227,33 +227,156 @@ WHERE experience_level IS NULL
    OR salary_level IS NULL;
 -- run the query above again to confirm no more NULL values
 
+---------------------------------------------------------------------------------------------------------------
 
 /*  ==============================================================
-    Task : Create a new column avg_salary_by_role to see average monthly salary per job title
+    Task A: Count number of Data engineers jobs. 
+    For simplicity just go for job_title Data Engineer.
     ==============================================================
 */
--- Alter table and column to add job_title_avg
-UPDATE TABLE staging.final_salaries
-ADD COLUMN avg_salary_by_role INTEGER;
+-- include close variants (e.g., "Data Engineer II", "Senior Data Engineer") use pattern matching
 
-
--- populate the avg_salary_by_role column
-UPDATE staging.final_salaries
-SET avg_salary_by_role = (
-    SELECT AVG(monthly_salary_in_sek)
-    FROM staging.final_salaries AS c2
-    WHERE c2.job_title = staging.final_salaries.job_title
-);
-
+SELECT COUNT(*) AS data_engineer_like_count
+FROM staging.salaries
+WHERE LOWER(TRIM(job_title)) LIKE '%data engineer%';
 
 
 /*  ==============================================================
-    Task : Rank the top 10 highest paying job titles based on
-    monthly salary in SEK.
+    Task B: Count number of unique job titles in total. 
     ==============================================================
 */
--- Top 10 highest paying job titles based on monthly salary in SEK
-SELECT job_title, monthly_salary_in_sek
+-- To inspect normalized variants and how many map to each normalized label:
+SELECT LOWER(TRIM(job_title)) AS normalized_title, 
+COUNT(*) AS occurrences
+FROM staging.salaries
+GROUP BY normalized_title
+ORDER BY occurrences DESC;
+
+-- Exact distinct count on the final table
+SELECT COUNT(DISTINCT job_title) AS unique_job_titles
+FROM staging.final_salaries;
+
+
+/*  ==============================================================
+    Task C: Find out how many jobs that goes into each salary level. 
+    ==============================================================
+*/
+-- Find out how many jobs that goes into each salary level
+SELECT DISTINCT salary_level,
+COUNT(*) AS occurrences
 FROM staging.final_salaries
-ORDER BY monthly_salary_in_sek DESC
+GROUP BY salary_level
+ORDER BY occurrences DESC;
+
+
+-- Using final_salaries
+SELECT
+  salary_level,
+  COUNT(*) AS num_jobs,
+  ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER(), 2) AS pct_of_total
+FROM staging.final_salaries
+GROUP BY salary_level
+ORDER BY pct_of_total DESC;
+
+
+/*  ==============================================================
+    Task D: Find out the median and mean salaries for each seniority levels.
+    ==============================================================
+*/
+
+-- Find out the median and mean salaries for each seniority levels.
+SELECT
+  experience_level,
+  COUNT(*) AS n_jobs,
+  ROUND(AVG(COALESCE(monthly_salary_in_sek, salary_in_sek / 12.0)), 2) AS mean_monthly_sek,
+  ROUND(median(COALESCE(monthly_salary_in_sek, salary_in_sek / 12.0)), 2) AS median_monthly_sek
+FROM staging.cleaned_salaries
+GROUP BY experience_level
+ORDER BY experience_level;
+
+-- exlpain COALESCE: The COALESCE function returns the first non-null value in a list of expressions. 
+-- In this query, it checks if monthly_salary_in_sek is NULL; if it is, it calculates the monthly salary by dividing salary_in_sek by 12. 
+-- This ensures that the average and median calculations use available salary data, whether it's provided monthly or yearly.
+
+/*  ==============================================================
+    Task E: Find out the top earning job titles based on their median salaries 
+    and how much they earn.
+    ==============================================================
+*/
+WITH src AS (
+  SELECT
+    job_title,
+    COALESCE(salary_in_sek, salary_in_usd * 10.0) AS annual_sek
+  FROM staging.cleaned_salaries
+)
+SELECT
+  job_title,
+  COUNT(*) AS n_jobs,
+  ROUND(median(annual_sek), 2) AS median_annual_sek
+FROM src
+WHERE annual_sek IS NOT NULL
+GROUP BY job_title
+ORDER BY median_annual_sek DESC
 LIMIT 10;
+
+/*  ==============================================================
+    Task F:  How many percentage of the jobs are fully remote, 
+    50 percent remote and fully not remote.
+    ==============================================================
+*/
+-- Count per remote_ratio value (simple grouping):
+SELECT remote_ratio, COUNT(*) AS num_jobs
+FROM staging.cleaned_salaries
+GROUP BY remote_ratio
+ORDER BY remote_ratio DESC;
+
+-- Counts for the three categories in one row:
+SELECT
+  SUM(CASE WHEN remote_ratio = 100 THEN 1 ELSE 0 END) AS fully_remote,
+  SUM(CASE WHEN remote_ratio = 50  THEN 1 ELSE 0 END) AS fifty_percent_remote,
+  SUM(CASE WHEN remote_ratio = 0   THEN 1 ELSE 0 END) AS not_remote
+FROM staging.cleaned_salaries;
+
+-- Percentages (rounded to 2 decimals) for those three categories:
+SELECT
+  ROUND(100.0 * SUM(CASE WHEN remote_ratio = 100 THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct_fully_remote,
+  ROUND(100.0 * SUM(CASE WHEN remote_ratio = 50  THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct_50_remote,
+  ROUND(100.0 * SUM(CASE WHEN remote_ratio = 0   THEN 1 ELSE 0 END) / COUNT(*), 2) AS pct_not_remote
+FROM staging.cleaned_salaries;
+
+
+/*  ==============================================================
+    Task G: Pick out a job title of interest and figure out if company size
+    affects the salary. Make a simple analysis as a comprehensive one 
+    requires causality investigations which are much harder to find.
+    ==============================================================
+*/
+
+-- Quick check: how many rows per company size for Data Engineer
+SELECT
+  company_size_full,
+  COUNT(*) AS n_jobs
+FROM staging.cleaned_salaries
+WHERE LOWER(job_title) LIKE '%data engineer%'
+GROUP BY company_size_full
+ORDER BY n_jobs DESC;
+
+-- Median annual salary (SEK) by company size
+SELECT company_size_full,
+       COUNT(*) AS n_jobs,
+       ROUND(median(COALESCE(salary_in_sek, salary_in_usd * 10.0)), 2) AS median_annual_sek,
+       ROUND(AVG(COALESCE(salary_in_sek, salary_in_usd * 10.0)), 2) AS mean_annual_sek
+FROM staging.cleaned_salaries
+WHERE LOWER(TRIM(job_title)) = 'data engineer'
+GROUP BY company_size_full
+ORDER BY median_annual_sek DESC;
+
+
+-- Median monthly salary (SEK) by company size
+SELECT company_size_full,
+       COUNT(*) AS n_jobs,
+       ROUND(median(COALESCE(monthly_salary_in_sek, salary_in_sek / 12.0, salary_in_usd * 10.0 / 12.0)), 2) AS median_monthly_sek
+FROM staging.cleaned_salaries
+WHERE LOWER(TRIM(job_title)) = 'data engineer'
+GROUP BY company_size_full
+ORDER BY median_monthly_sek DESC;
