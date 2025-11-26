@@ -1,100 +1,46 @@
-# Exercise 1 - Data transformations
+# Exercise 01 — Data transformations
 
-In this exercise, you get to familiarize yourself with SQL.
+## Quick overview
+--------------
+- Load raw CSV into DuckDB (staging.salaries).
+- Clean and enrich the data (staging.cleaned_salaries).
+- Create a final table for analysis (staging.final_salaries).
+- `sql_0/create.sql` — reads data/salaries.csv into staging.salaries (read_csv_auto).
+- `sql_0/transform.sql` — performs the cleaning steps and builds cleaned and final tables.
 
-> [!NOTE]
-> To ingest data to the database, you should use CLI in combination with SQL script
+## How to run
+----------
+1. Load the raw CSV:
+   - duckdb salaries.duckdb < sql_0/create.sql
 
-> [!NOTE]
-> Try not to skip those tasks which are more free, where you need to think what else that could be explored, transformed etc. These are very important as in industry it's common that you need to explore data and participate in stakeholders and team discussions.
+2. Open DuckDB UI:
+   - duckdb -ui salaries.duckdb
 
-## 0. Transform salaries data
+3. Run the transform script:
+   - duckdb salaries.duckdb < sql_0/transform.sql
 
-For this task you should use the same salaries data as in lecture 04 and 05. Create a new table that should contain the transformed data and call the table cleaned_salaries.
+4. Inspect tables:
+   - SELECT * FROM staging.salaries;
+   - SELECT * FROM staging.cleaned_salaries;
+   - SELECT * FROM staging.final_salaries;
 
-&nbsp; a) Transform employment type column based on this table
+## Project structure
+-----------------
 
-| abbreviation | meaning   |
-| ------------ | --------- |
-| CT           | Contract  |
-| FL           | Freelance |
-| PT           | Part time |
-| FT           | Full time |
+```
+01_data_transform/
+    |- data/
+        |- salaries.csv              # The dataset for exercises
+    |- sql_0/
+        |- create.sql                # Loads the data into staging.salaries
+        |- transform.sql             # Cleans data and creates cleaned/final tables
+README.md
+```
 
-&nbsp; b) Do similar for company size, but you have to figure out what the abbreviations could stand for.
 
-&nbsp; c) Make a salary column with Swedish currency for yearly salary.
+## Small checklist to improve scripts
+---------------------------------
+- Make column names consistent (e.g., salary_in_sek_monthly vs monthly_salary_in_sek).
+- Use ALTER TABLE ... ADD COLUMN to add columns (not UPDATE TABLE).
+- Add validation queries at the start of transform.sql: row counts, NULL counts, and distinct checks.
 
-&nbsp; d) Make a salary column with Swedish currency for monthly salary.
-
-&nbsp; e) Make a salary_level column with the following categories: low, medium, high, insanely_high. Decide your thresholds for each category. Make it base on the monthly salary in SEK.
-
-&nbsp; f) Choose the following columns to include in your table: experience_level, employment_type, job_title, salary_annual_sek, salary_monthly_sek, remote_ratio, company_size, salary_level
-
-&nbsp; g) Think of other transformation that you want to do.
-
-## 1. Explore your transformed table
-
-&nbsp; a) Count number of Data engineers jobs. For simplicity just go for job_title Data Engineer.
-
-&nbsp; b) Count number of unique job titles in total.
-
-&nbsp; c) Find out how many jobs that goes into each salary level.
-
-&nbsp; d) Find out the median and mean salaries for each seniority levels.
-
-&nbsp; e) Find out the top earning job titles based on their median salaries and how much they earn.
-
-&nbsp; f) How many percentage of the jobs are fully remote, 50 percent remote and fully not remote.
-
-&nbsp; g) Pick out a job title of interest and figure out if company size affects the salary. Make a simple analysis as a comprehensive one requires causality investigations which are much harder to find.
-
-&nbsp; h) Feel free to explore other things
-
-## 2. Theory questions
-
-These study questions are good to get an overview of how SQL and relational databases work.
-
-&nbsp; a) What are the main categories of SQL commands?
-
-&nbsp; b) Explain the difference between HAVING and WHERE clauses?
-
-&nbsp; c) How to make sure you delete the correct rows?
-
-&nbsp; d) How do you retrieve unique values in a column?
-
-&nbsp; e) What does data transformation mean?
-
-&nbsp; f) How do you create a new row in a table?
-
-&nbsp; g) What happens if you omit the WHERE clause in an UPDATE statement?
-
-&nbsp; h) What happens if you omit the WHERE clause in a DELETE statement?
-
-&nbsp; i) What is a conditional statement in SQL, and can it be used with SELECT?
-
-## Glossary
-
-Fill in this table either by copying this into your own markdown file or copy it into a spreadsheet if you feel that is easier to work with.
-
-| terminology         | explanation |
-| ------------------- | ----------- |
-| CRUD                |             |
-| query               |             |
-| statement           |             |
-| schema              |             |
-| aliasing            |             |
-| projection          |             |
-| selection           |             |
-| namespace           |             |
-| SELECT clause       |             |
-| WHERE clause        |             |
-| condition           |             |
-| BETWEEN             |             |
-| aggregate functions |             |
-| range filtering     |             |
-| pattern matching    |             |
-| list filtering      |             |
-|                     |             |
-|                     |             |
-|                     |             |
