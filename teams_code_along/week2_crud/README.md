@@ -1,5 +1,7 @@
 # In-class exercise, week 2
-This exercise covers knowledge in chapter 6 & 7. The background is that you are a data engineer responsible for the HR data of a company. Write SQL queries to respond to stakeholders' requirements below:
+This exercise covers knowledge in chapter 6 & 7. 
+The background is that you are a data engineer responsible for the HR data of a company. Write SQL queries to respond to stakeholders' requirements below:
+
 [![YouTube Video](https://img.youtube.com/vi/2I7ml2wsOgg/0.jpg)](https://youtu.be/2I7ml2wsOgg)
 <br>
 **Your Title Here**
