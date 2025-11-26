@@ -44,7 +44,7 @@ This short folder shows how to enforce rules on table columns using constraints 
 - Use CHECK for simple business rules (e.g., salary >= 0).
 - Use DEFAULT for convenient, consistent values.
 
-#### References  
+References  
 [alter table]: https://duckdb.org/docs/sql/alter_table  
 [constraints]: https://duckdb.org/docs/stable/sql/constraints  
 [create table]: https://duckdb.org/docs/sql/create_table
