@@ -1,7 +1,7 @@
 /* This file only handles loading raw data into the ui, then start 
 transforming in another sql file called transform.sql
 $
-duckdb salaries.duckdb < sql_0/create.sql
+duckdb salaries.duckdb < sql/create.sql
 duckdb -ui salaries.duckdb
 */
 
