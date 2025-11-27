@@ -14,9 +14,9 @@ Short, hands-on examples for working with dates and timestamps in DuckDB.
 ## Ingest data
    - DuckDB CLI:
      ```
-     duckdb mydb.duckdb < sql/ingest_data.sql
-     duckdb mydb.duckdb
-     -- then run queries
+     duckdb name.duckdb < sql/ingest_data.sql
+     duckdb -ui name.duckdb
+     -- then run queries in ui
      ```
 
 ## Quick examples
