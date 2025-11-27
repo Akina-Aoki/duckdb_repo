@@ -1,6 +1,8 @@
 -- duckdb set_operations.duckdb < sql/synthetic_data.sql
 -- duckdb -ui set_operations.duckdb
 
+-- Go to next sql file to see set operations examples: set_op.sql
+
 CREATE SCHEMA IF NOT EXISTS synthetic;
 
 -- synthetic.sales_jan table
@@ -49,9 +51,7 @@ INSERT INTO synthetic.products VALUES
 (5, 'Laptop', 'Electronics', 1200.00); -- duplicate row
 
 
-
-
-
 SELECT * FROM synthetic.sales_jan; 
 
 SELECT * FROM synthetic.sales_feb; 
+
