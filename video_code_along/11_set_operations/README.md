@@ -175,6 +175,7 @@ SELECT name, type FROM sqlite.sqlite_master WHERE type='table' LIMIT 20;
 ```
 
 ## References
+
 [SQL Set Operations]: https://www.youtube.com/watch?v=LUSPRn2zxSo
 [SQLITE Database in Duckdb]: https://motherduck.com/blog/analyze-sqlite-databases-duckdb/
 [Set Operations Duckdb]: https://duckdb.org/docs/stable/sql/query_syntax/setops

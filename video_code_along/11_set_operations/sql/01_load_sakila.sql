@@ -8,4 +8,6 @@ CALL sqlite_attach('data/sqlite-sakila.db'); -- had a problem with the path
 -- duckdb sakila.duckdb < sql/01_load_sakila.sql
 -- duckdb sakila.duckdb
 -- after checking with: 'desc;' and 'from film;'
--- exit and open in ui: duckdb-ui sakila.duckdb
+-- exit and open in ui: duckdb -ui sakila.duckdb
+
+-- once opened in ui, work on 02_eda_sakila.sql next
