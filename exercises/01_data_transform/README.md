@@ -44,25 +44,6 @@ README.md
 - Use ALTER TABLE ... ADD COLUMN to add columns (not UPDATE TABLE).
 - Add validation queries at the start of transform.sql: row counts, NULL counts, and distinct checks.
 
-# SQL Theory Questions & Glossary
-
-## 2. Theory questions
-
-These are short, simple answers.
-
-| Question | Answer |
-| --- | --- |
-| a) What are the main categories of SQL commands? | DDL (Data Definition Language), DML (Data Manipulation Language), DCL (Data Control Language), TCL (Transaction Control Language) |
-| b) Explain the difference between HAVING and WHERE clauses? | WHERE filters individual rows before aggregation; HAVING filters groups after aggregation (after GROUP BY). |
-| c) How to make sure you delete the correct rows? | Test the WHERE condition with a `SELECT` first; run `DELETE` inside a transaction so you can `ROLLBACK`; use precise conditions and backups. |
-| d) How do you retrieve unique values in a column? | `SELECT DISTINCT column FROM table;` or `SELECT column, COUNT(*) FROM table GROUP BY column;` |
-| e) What does data transformation mean? | Converting, cleaning, enriching, or reshaping raw data into a desired format or structure for analysis/storage. |
-| f) How do you create a new row in a table? | `INSERT INTO table_name (col1, col2, ...) VALUES (val1, val2, ...);` |
-| g) What happens if you omit the WHERE clause in an UPDATE statement? | The UPDATE applies to every row in the table. |
-| h) What happens if you omit the WHERE clause in a DELETE statement? | All rows in the table are deleted. |
-| i) What is a conditional statement in SQL, and can it be used with SELECT? | `CASE WHEN ... THEN ... ELSE ... END` — yes, it can be used in `SELECT`, `WHERE`, `ORDER BY`, etc. |
-
----
 ## Theory questions
 
 | Question | Answer |
