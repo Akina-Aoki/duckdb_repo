@@ -8,179 +8,128 @@ Find the sql files in video_code_along/09_temporal_data
 Find the sql files in video_code_along/11_set_operations
 
 
-Continue working on the data from lecture 09_strings. In this lecture you created a schema called staging and ingested the raw data into the staging schema.
+## Theory questions
 
-### Environment & Ingestion
-All raw data lands in the `staging` schema as the first step in the pipeline.
+These study questions are good to get an overview of how SQL and relational databases work.
 
-```bash
-duckdb temporal_data.duckdb < sql/ingest_data.sql
-duckdb -ui temporal_data.duckdb
-```
+&nbsp; a) What is the difference between INNER JOIN and INTERSECT?
 
-### a) Create a schema called refined. This is the schema where you'll put the transformed data.
-        - Workflow before creating the refined schema
-        - I opened the temporal_data lecture in the duckdb ui and created refined schema there.
-        - The following below are the following queries for exercise 0 for refined schema creation.
+&nbsp; b) When are the purposes of set operations?
 
+&nbsp; c) What are the main difference between joins and set operations?
 
-```arduino
-┌─────────────────────────────────────────┐
-│               Data Base                 │
-└─────────────────────────────────────────┘
-              │
-              ▼
-┌──────────────────────────┐
-│        staging           │
-│  - raw                   │
-│  - unmodified            │
-│  - ingestion only        │
-└──────────────────────────┘
-              │  (ETL/ELT)
-              ▼
-┌──────────────────────────┐
-│        refined           │
-│  - cleaned               │
-│  - typed                 │
-│  - analytics-ready       │
-└──────────────────────────┘
-```
+&nbsp; d) When is set operators used contra logical operators?
 
-| Zone        | Purpose                        | Allowed Operations                          | Not Allowed                         |
-| ----------- | ------------------------------ | ------------------------------------------- | ----------------------------------- |
-| **staging** | Raw data landing zone          | Ingestion only                              | No cleaning, no casting, no updates |
-| **refined** | Clean, trusted analytics layer | Transforming, type-casting, standardization | No raw ingestion                    |
+&nbsp; e) How to achieve this using set operations in SQL, where A and B are result sets.
 
+<img src ="https://github.com/kokchun/assets/blob/main/sql/set_question_1.png?raw=true" width = 200>
 
-### b) Now transform and clean the data and place the cleaned table inside the refined schema.
-### TIP: The strategic model: Staging → Refined
+&nbsp; f) How to achieve this using set operations in SQL, where A and B are result sets.
 
-    In any modern data architecture production, the golden rule is:
+<img src ="https://github.com/kokchun/assets/blob/main/sql/set_question_2.png?raw=true" width = 200>
 
-    - Always ingest into staging first.
-    - Do all cleaning, parsing, and quality checks in staging.
-    - Push only clean, modeled, high-quality tables into refined.
+&nbsp; g) Does joining order matter for three or more tables?
 
+## Glossary
 
-    ```sql
-    CREATE TABLE IF NOT EXISTS refined.trains_schedules AS
-    SELECT ...
-    FROM staging.trains_schedules
-    WHERE ...
-    ```
+| terminology        | explanation                                                                                                                                                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **temporal**       | Refers to *time-based data*, such as dates, timestamps, intervals, durations. Temporal queries answer questions like “What trains departed last Monday?” or “What is the delay difference between scheduled and actual time?”                                            |
+| **interval**       | A *time duration* (e.g., “2 hours”, “3 days”). Often used for calculations.<br><br>Example:<br>`sql\nSELECT NOW() + INTERVAL '2 hours';`                                                                                                                                 |
+| **synthetic**      | Data that is *artificially generated* instead of collected from the real world. Used for testing, training, teaching.                                                                                                                                                    |
+| **VALUES**         | A SQL constructor used to create *inline rows* without a table.<br><br>Example:<br>`sql\nSELECT * FROM (VALUES (1, 'A'), (2, 'B')) AS t(id, label);`                                                                                                                     |
+| **subquery**       | A query *inside* another query. It acts like a temporary table.<br><br>Example:<br>`sql\nSELECT * FROM (SELECT * FROM trains WHERE delay_minutes > 10);`                                                                                                                 |
+| **compound query** | A query made by *combining multiple SELECTs* using set operations such as `UNION`, `INTERSECT`, or `EXCEPT`.                                                                                                                                                             |
+| **set operations** | Operations that treat results like mathematical sets. They compare *whole rows* between SELECT statements.<br><br>**Includes:**<br>- `UNION`<br>- `UNION ALL`<br>- `INTERSECT`<br>- `EXCEPT`<br><br>Visual:<br>`\nA ∪ B  (UNION)\nA ∩ B  (INTERSECT)\nA - B  (EXCEPT)\n` |
+| **EXCEPT**         | Returns rows that exist in **A** but not in **B**.<br><br>Venn diagram style:<br>`\n A: ●●●●●\n B:   ●●\n A EXCEPT B = only the left circle\n`                                                                                                                           |
+| **result set**     | The output table that a SQL query returns.                                                                                                                                                                                                                               |
+| **UNION**          | Combines two result sets and **removes duplicates**.<br><br>`\n A = {1,2,3}\n B = {3,4}\n A UNION B = {1,2,3,4}\n`                                                                                                                                                       |
+| **UNION ALL**      | Combines two result sets and **keeps duplicates**.<br><br>`\n A = {1,2,3}\n B = {3,4}\n A UNION ALL B = {1,2,3,3,4}\n`                                                                                                                                                   |
+| **operator**       | A symbol/keyword that performs an action, such as `+`, `=` , `LIKE`, `UNION`.                                                                                                                                                                                            |
+| **INTERSECT**      | Returns only rows that exist *in both sets*. <br><br>Diagram:<br>`\n A ∩ B  (overlapping part)\n`                                                                                                                                                                        |
+| **venn diagram**   | A visual tool to show relationships between sets (like A ∪ B, A ∩ B). Often used to explain set operations.                                                                                                                                                              |
+| **LEFT JOIN**      | Returns **all rows from the left table**, and matching rows from the right. Missing matches become NULL.<br><br>Diagram:<br>`\nLEFT: ●●●●●\nRIGHT:   ●●\nResult: keep all from LEFT\n`                                                                                   |
+| **INNER JOIN**     | Returns only rows that match in *both* tables.<br><br>Diagram:<br>`\nA ●●●\nB   ●●●\noverlap = INNER JOIN\n`                                                                                                                                                             |
+| **RIGHT JOIN**     | Opposite of LEFT JOIN: keep all rows from the right table and matching rows from the left.                                                                                                                                                                               |
+| **LIKE**           | A simple pattern-matching operator.<br><br>Examples:<br>`sql\nWHERE city LIKE 'Stock%'\nWHERE name LIKE '%son'\n`                                                                                                                                                        |
+| **ILIKE**          | Case-insensitive version of LIKE.<br><br>`sql\nWHERE city ILIKE 'stock%'\n`                                                                                                                                                                                              |
+| **regexp**         | Pattern matching using *regular expressions*, more powerful than LIKE.<br><br>`sql\nWHERE email ~ '^[a-z]+@[a-z]+\\.com$'\n`                                                                                                                                             |
 
-```pgsql    
-staging.train_schedules
-        │
-        ├── Validate structure
-        ├── Profile timestamps & integers
-        └── Maintain row count
-                ▼
-refined.trains_schedules
-        ├── Cast timestamps
-        ├── Retain numeric fields
-        └── Prepare for analytics
-```
-
-
-### What not to do
-
-    - Do NOT ingest raw CSVs directly into the refined schema.
-    - Do NOT transform inside refined.
-    - Do NOT move raw data around.
-    - That breaks lineage, makes debugging painful, and kills data governance.
-
-### Check the staging.trains_schedule to see what needs to be transformed
-
+## JOINS
 ```sql
--- check staging.trains_schedule again
-SELECT * 
-FROM staging.train_schedules;
+INNER JOIN     → overlap only
+LEFT JOIN      → everything from LEFT + matches
+RIGHT JOIN     → everything from RIGHT + matches
+FULL JOIN      → all rows from both sides (DuckDB supports it)
 ```
 
-**Data set is already clean**
-- `scheduled_arrival`, `actual_arrival`, `departure_time` are already valid TIMESTAMP strings
-
-- `delay_minutes` and `passengers` are clean integers (no quotes)
-
-- No nulls, no weird whitespace, no broken rows
-- This means transformation layer can be incredibly lightweight.
-
-### transformation strategy
-| Column Name       | Format                     | Status |
-| ----------------- | -------------------------- | ------ |
-| scheduled_arrival | timestamp-formatted string | Clean  |
-| actual_arrival    | timestamp-formatted string | Clean  |
-| departure_time    | timestamp-formatted string | Clean  |
-| delay_minutes     | integer                    | Clean  |
-| passengers        | integer                    | Clean  |
-
-
-### Create `refined.trains_schedules`
+## Set Operations
 ```sql
-CREATE TABLE IF NOT EXISTS refined.trains_schedules AS
-SELECT
-    route,
-    CAST(scheduled_arrival AS TIMESTAMP) AS scheduled_arrival,
-    CAST(actual_arrival     AS TIMESTAMP) AS actual_arrival,
-    CAST(departure_time     AS TIMESTAMP) AS departure_time,
-    delay_minutes,
-    passengers
-FROM staging.train_schedules;
+UNION          → combine sets, remove duplicates
+UNION ALL      → combine sets, keep duplicates
+INTERSECT      → intersection (overlap)
+EXCEPT         → rows in A but not in B
 ```
 
+```css
+A ∪ B   → UNION
+A ∩ B   → INTERSECT
+A - B   → EXCEPT
+```
 
-### c) Exploratory Queries
+## JOINS
+![alt text](image-2.png)
 
-1. Delay filtering
-
+## String Matching
 ```sql
-SELECT *
-FROM refined.trains_schedules
-WHERE delay_minutes > 0;
+LIKE           → basic patterns
+ILIKE          → case-insensitive
+regexp (~)     → advanced patterns
 ```
 
-
-2. Pattern-match routes using `LIKE`
-
+## Interval
 ```sql
-SELECT *
-FROM refined.trains_schedules
-WHERE route LIKE '%Stockholm%';
+SELECT NOW() + INTERVAL '3 days';
 ```
 
-3. Date Extraction
+## Synthetic
+![alt text](image-1.png)
+[What is Synthetic Data Generation? (K2View)](https://www.k2view.com/what-is-synthetic-data-generation/)
 
+## Values
+A SQL constructor for creating inline rows.
 ```sql
-SELECT
-    route,
-    DATE(departure_time) AS dep_date,
-    delay_minutes
-FROM refined.trains_schedules;
+SELECT * FROM (VALUES (1, 'A'), (2, 'B')) AS t(id, label);
 ```
 
-4. Build queries that joins holiday table with refined.Train_schedules to analyze:
-
+## Subquery
+A query inside another query.
+Used like a temporary table.
 ```sql
-SELECT
-    t.route,
-    t.departure_time,
-    t.delay_minutes,
-    h.holiday_english
-FROM refined.trains_schedules t
-JOIN refined.sweden_holidays h
-    ON DATE(t.departure_time) = h.holiday_date
-ORDER BY t.departure_time;
+Main Query
+└── Subquery
+    └── Data
 ```
 
-| Insight                    | Value          |
-| -------------------------- | -------------- |
-| Holiday detected           | Epiphany       |
-| Avg delay (holiday window) | ~12 minutes    |
-| Dataset coverage           | −9 to +12 days |
+## Compound Query
+A query built using set operators like:
+UNION, UNION ALL, INTERSECT, EXCEPT
+They allow combining whole result sets.
 
-**Result**
-- All trains in your dataset departed close to Epiphany
-- Average delay in that period was 12 minutes
-- Dataset contains trains that occurred between 9 days before and 12 days after Epiphany
+## LIKE
+Basic pattern matching.
+```sql
+WHERE name LIKE 'Stock%'
+```
 
+## ILIKE
+Case-insensitive LIKE.
+```sql
+WHERE name LIKE 'Stock%'
+```
+
+## regex
+Regular expression matching for extremely flexible patterns.
+```sql
+WHERE email ~ '^[a-z]+@[a-z]+\\.com$'
+```

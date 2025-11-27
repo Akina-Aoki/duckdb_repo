@@ -14,7 +14,7 @@ Short, hands-on examples for working with dates and timestamps in DuckDB.
 │   └── timestamp.sql              # timestamp examples (age, date_trunc, extract)
 │
 └── exercise 2/
-    └── temporal_data              # main exercise folder
+    └── ex_02_refined.sql          # main exercise 2 task 0 folder
 ```
 
 
@@ -46,11 +46,15 @@ Short, hands-on examples for working with dates and timestamps in DuckDB.
   ```
 
 ## Data notes
-- read_csv_auto guesses types. If a date or timestamp is read as text, use strptime(... ) to parse and cast.
+`read_csv_auto` guesses types. If a `date` or `timestamp` is read as text, use `strptime(... )` to parse and cast.
 
 ## References (DuckDB)
-[Date/time functions]: https://duckdb.org/docs/sql/functions/datetime
-[DuckDB GitHub]: https://github.com/duckdb/duckdb
+- [Date/time functions][duckdb-datetime]
+- [DuckDB GitHub][duckdb-github]
+
+[duckdb-datetime]: https://duckdb.org/docs/sql/functions/datetime
+[duckdb-github]: https://github.com/duckdb/duckdb
+
 
 ____________________________________________________________________________________________________________________
 
