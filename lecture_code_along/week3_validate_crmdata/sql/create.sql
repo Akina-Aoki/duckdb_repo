@@ -76,7 +76,7 @@ WHERE NOT regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]');
  ================================*/
  SELECT *
  FROM staging.crm_all
- WHERE NOT regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]')
+ WHERE NOT regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]') OR
        NOT region IN ('EU', 'US') OR
        NOT status IN ('active', 'inactive');
 
