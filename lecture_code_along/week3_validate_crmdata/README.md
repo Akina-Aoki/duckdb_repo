@@ -1,64 +1,208 @@
-# In-class exercise, week 3
-This exercise covers knowledge in chapter 10, 11 and previous chapters. The background is that your company is migrating the [CRM](https://sv.wikipedia.org/wiki/Customer_relationship_management) system. Before retiring the old CRM system completely, your company would like to check if both systems contain the same customers. In addition, data in both systems can have invalid values. 
+# Week 3: Beginner Guide: Validate CRM Data with DuckDB
 
-Your responsibility is to validate data quality and compare system consistency. Follow the tasks below: 
+## Purpose
+- Validate data quality of two CRM exports.
+- Compare records between old and new CRM systems.
+- Produce a discrepancy report for records that need follow-up.
+
+## Important notes (key concepts)
+- Constraints: use CHECK, NOT NULL, UNIQUE to enforce column-level rules.
+- Compound queries: use UNION, EXCEPT, INTERSECT to compare datasets.
+- Set operations: EXCEPT = difference, INTERSECT = intersection, UNION = union.
+- Staging -> Constrained: ingest raw CSV into a staging schema, inspect and clean, then insert valid rows into a constrained schema.
+
+## Files and purpose
+
+| Path | Type | Purpose |
+|---|---:|---|
+| lecture_code_along/week3_validate_crmdata/data/crm_new.csv | CSV | New CRM system export (raw). Loaded into staging.crm_new |
+| lecture_code_along/week3_validate_crmdata/data/crm_old.csv | CSV | Old CRM system export (raw). Loaded into staging.crm_old |
+| lecture_code_along/week3_validate_crmdata/sql/create.sql | SQL | Lecture SQL: staging and constrained examples |
+| lecture_code_along/week3_validate_crmdata/sql/create2.sql | SQL | Alternative SQL: crm_all and beginner-friendly discrepancy report |
+| lecture_code_along/week3_validate_crmdata/README.md | Markdown | Exercise instructions |
+| lecture_code_along/week3_validate_crmdata/BEGINNER_GUIDE.md | Markdown | Beginner friendly documentation (this file) |
 
 
-## Task 1
-You are given two csv files exported from the two CRM systems for customer information. 
+## Workflow diagram
+| Step | Action |
+|---|---|
+| ingest | create staging schema; load crm_new.csv and crm_old.csv into staging tables |
+| inspect | find invalid emails, regions, and statuses in staging |
+| constrain | create constrained schema; define column constraints; insert valid rows |
+| compare | use EXCEPT / INTERSECT to find only_in_old, only_in_new, and common customers |
+| report | build discrepancy report by UNION of subqueries |
 
-Create a database called *crm* with a *staging* schema. Then, create two tables under the *staging* schema to store the data of the two csv files. 
 
+## Setup and ingestion (DuckDB UI or CLI)
+- Launch DuckDB from repository root so relative paths work.
+- Create staging schema and load CSVs with read_csv_auto().
 
-## Task 2
-Both CRM datasets may contain invalid records. Identify all rows in both datasets that fail to meet the following rules:'
-
-### The email address must include an `@` symbol followed later by a `.`  
-
-- This is only using the LIKE and % wildcard
-```bash
-crm_all: 
-customer_id	name	email	region	status
-1030	Stephen	@@@	EU	active      
-``` 
-
-- Using regular expression can catch more problematic rows
+Example commands:
 ```sql
+CREATE SCHEMA IF NOT EXISTS staging;
+
+CREATE TABLE IF NOT EXISTS staging.crm_new AS
+SELECT *
+FROM read_csv_auto('lecture_code_along/week3_validate_crmdata/data/crm_new.csv');
+
+CREATE TABLE IF NOT EXISTS staging.crm_old AS
+SELECT *
+FROM read_csv_auto('lecture_code_along/week3_validate_crmdata/data/crm_old.csv');
+
+-- Quick check
+SELECT COUNT(*) AS rows_new FROM staging.crm_new;
+SELECT COUNT(*) AS rows_old FROM staging.crm_old;
 ```
 
-### The region value must be either `EU` or `US`  
+### Data quality rules (used for validation)
+1. email must contain '@' and later a '.'  
+2. region must be 'EU' or 'US'  
+3. status must be 'active' or 'inactive'
+
+### Task: Find invalid records
+- Crude LIKE check for simple email rule:
 ```sql
-region
-AU
-AS
+SELECT *
+FROM staging.crm_new
+WHERE email NOT LIKE '%@%.%';
 ```
 
-### The status must be either `active` or `inactive`
+###  Regex check for stricter email validation:
+```sql
+SELECT *
+FROM staging.crm_new
+WHERE NOT regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]+');
+```
 
+### Combine all three rules in one WHERE clause:
+```sql
+SELECT *
+FROM staging.crm_new
+WHERE NOT regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]+')
+  OR region NOT IN ('EU','US')
+  OR status NOT IN ('active','inactive');
+```
 
-## Task 3
-Create a new schema called *constrained* and create two tables under it. For each table, create column constraints for the rules specified in task 2 and insert rows fulfilling these constraints separately from the two tables in the staging schema. 
+### Task: Create constrained schema and insert valid rows
+- Create constrained schema and tables with CHECK constraints, then insert valid rows from staging.
 
+Example:
+```sql
+CREATE SCHEMA IF NOT EXISTS constrained;
 
-## Task 4
-**In tasks 4 and 5, use the data in the *staging* schema that store customer records before column constraints are enforced.**
+CREATE TABLE IF NOT EXISTS constrained.crm_new (
+  customer_id INTEGER UNIQUE,
+  name VARCHAR NOT NULL,
+  email VARCHAR CHECK (regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]+')),
+  region VARCHAR CHECK (region IN ('EU','US')),
+  status VARCHAR CHECK (status IN ('active','inactive'))
+);
 
-To validate whether the old and new CRM systems keep the same customer records, use the column *customer_id* as the unique identifier of customers and find out:
-- customers only recorded in the old CRM system
-- customers only recorded in the new CRM system
-- customers recorded in both CRM system
-  
+CREATE TABLE IF NOT EXISTS constrained.crm_old (
+  customer_id INTEGER UNIQUE,
+  name VARCHAR NOT NULL,
+  email VARCHAR CHECK (email LIKE '%@%.%'),
+  region VARCHAR CHECK (region IN ('EU','US')),
+  status VARCHAR CHECK (status IN ('active','inactive'))
+);
 
-## Task 5
-With your findings above, you are going to produce a discrepancy report showing customer records that have issues and need to be further checked with the system migration and customer teams. 
+INSERT INTO constrained.crm_new
+SELECT *
+FROM staging.crm_new
+WHERE regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]+')
+  AND region IN ('EU','US')
+  AND status IN ('active','inactive');
 
-Include records that
-- violate constraints in task 2
-- are not common as you found in task 4
+INSERT INTO constrained.crm_old
+SELECT *
+FROM staging.crm_old
+WHERE regexp_matches(email, '[A-Za-z0-9]+@[A-Za-z]+\.[A-Za-z]+')
+  AND region IN ('EU','US')
+  AND status IN ('active','inactive');
+```
 
->[!Tip]
->One way to solve this is to use sql subquery where a query is nested in another query. For example:
->```sql
->(subquery)
->UNION
->(subquery) 
+### Task: Compare systems (customer_id as unique identifier)
+- Customers only in old system:
+```sql
+SELECT customer_id
+FROM staging.crm_old
+EXCEPT
+SELECT customer_id
+FROM staging.crm_new;
+```
+
+- Customers only in new system:
+```sql
+SELECT customer_id
+FROM staging.crm_new
+EXCEPT
+SELECT customer_id
+FROM staging.crm_old;
+```
+
+- Customers in both systems:
+```sql
+SELECT customer_id
+FROM staging.crm_new
+INTERSECT
+SELECT customer_id
+FROM staging.crm_old;
+```
+
+### Task: Discrepancy report 
+- Four subqueries combined with UNION:
+  - only_in_old: full rows only in old
+  - only_in_new: full rows only in new
+  - invalid_old: rows in old violating rules
+  - invalid_new: rows in new violating rules
+
+Example report:
+```sql
+SELECT
+  'only_in_old' AS issue,
+  customer_id, name, email, region, status
+FROM staging.crm_old
+WHERE customer_id IN (
+  SELECT customer_id FROM staging.crm_old
+  EXCEPT
+  SELECT customer_id FROM staging.crm_new
+)
+
+UNION
+
+SELECT
+  'only_in_new' AS issue,
+  customer_id, name, email, region, status
+FROM staging.crm_new
+WHERE customer_id IN (
+  SELECT customer_id FROM staging.crm_new
+  EXCEPT
+  SELECT customer_id FROM staging.crm_old
+)
+
+UNION
+
+SELECT
+  'invalid_old' AS issue,
+  customer_id, name, email, region, status
+FROM staging.crm_old
+WHERE NOT (
+  email LIKE '%@%.%' AND
+  region IN ('EU','US') AND
+  status IN ('active','inactive')
+)
+
+UNION
+
+SELECT
+  'invalid_new' AS issue,
+  customer_id, name, email, region, status
+FROM staging.crm_new
+WHERE NOT (
+  email LIKE '%@%.%' AND
+  region IN ('EU','US') AND
+  status IN ('active','inactive')
+)
+
+ORDER BY issue, customer_id;
+```
