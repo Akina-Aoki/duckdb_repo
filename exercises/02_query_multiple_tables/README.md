@@ -179,6 +179,7 @@ SELECT * FROM B;
 ### f) How to achieve this using set operations in SQL, where A and B are result sets.
 
 <img src ="https://github.com/kokchun/assets/blob/main/sql/set_question_2.png?raw=true" width = 200>
+
 ```sql
 /* Part 1: Unique to A (Left side) */
 SELECT * FROM A
@@ -192,6 +193,7 @@ SELECT * FROM B
 EXCEPT
 SELECT * FROM A;`
 ```
+
 **Breakdown of the Logic**
 - Top Block (A EXCEPT B): This grabs the white crescent on the left (Items in A, but not B).
 
