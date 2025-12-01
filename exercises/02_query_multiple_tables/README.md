@@ -202,6 +202,27 @@ SELECT * FROM A;`
 - `UNION ALL`: This stitches the two results together into one final list.
 
 ### g) Does joining order matter for three or more tables?
+Yes, the order can matter, but it depends on whether you are talking about the logical result (the data you get back) or the performance (how fast it runs).
+
+#### 1. For INNER JOINS: Order Doesn't Matter
+If you are only using `INNER JOIN`, the order is generally irrelevant.
+
+**(A + B) + C is the same as (A + C) + B**
+
+Because `INNER JOIN` only keeps rows that exist in all tables involved, you end up with the same intersection regardless of which one you grab first.
+
+#### 2. For LEFT/RIGHT JOINS: Order Matters A Lot!
+When you start mixing `LEFT JOIN` or `RIGHT JOIN`, the order defines who the "Boss" table is.
+
+Think of a `LEFT JOIN` like a waterfall. Data flows from top to bottom (or left to right). If you break the chain, the water stops.
+
+**Example Scenario:**
+
+**Table A (Actors)**: All actors.
+
+**Table B (Film_Actor)**: The bridge.
+
+**Table C (Films)**: The movies.
 
 ## Glossary
 

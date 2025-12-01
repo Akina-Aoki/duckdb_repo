@@ -1,7 +1,39 @@
-# sakila query explanation
+# plant and sakila query explanations
 
+## plant data
+This document walks through the two SQL files in this folder:
+- `sql/01_generate_data.sql` - creates the plants dataset and inserts sample rows
+- `sql/02_joins.sql` - demonstrates different JOIN types using the sample data
+
+### Ingestion
+1. Create a DuckDB file and run the generator SQL:
+```bash
+duckdb data/plants.duckdb < sql/01_generate_data.sql
+duckdb -ui data/plants.duckdb
+```
+
+### 1) LEFT JOIN (plants LEFT JOIN plant_care)
+
+```sql
+SELECT p.plant_id, p.plant_name, p.type, pc.water_schedule, pc.sunlight
+FROM main.plants p
+LEFT JOIN main.plant_care pc ON p.plant_id = pc.plant_id;
+```
+- Return all rows from `plants`. If there is a matching `plant_care` row, include its columns; otherwise return NULL for care columns.
+
+Expected result rows:
+```text
+plant_id | plant_name | type      | water_schedule | sunlight
+1        | Rose       | Flower    | Daily          | Full Sun
+2        | Oak        | Tree      | NULL           | NULL
+3        | Tulip      | Flower    | Weekly         | Partial Sun
+4        | Cactus     | Succulent | Biweekly       | Full Sun
+5        | Sunflower  | Flower    | NULL           | NULL
+```
+
+
+--------------------------------------------------------------------------------------------------------------------
 # Study Guide
-
 ## JOINS vs SET OPERATIONS
 ```sql
 INNER JOIN  → overlap only  
