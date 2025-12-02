@@ -1,11 +1,14 @@
-# plant and sakila query explanations
+# JOINS
+![alt text](image.png)
+
+# plants and sakila query explanations
 This document walks through the two SQL files in this folder:
 - `sql/01_generate_data.sql` - creates the plants dataset and inserts sample rows
 - `sql/02_joins.sql` - demonstrates different JOIN types using the sample data
 
 # plant data
 ## Ingestion
-1. Create a DuckDB file and run the generator SQL:
+Create a DuckDB file and run the generator SQL:
 ```bash
 duckdb data/plants.duckdb < sql/01_generate_data.sql
 duckdb -ui data/plants.duckdb
@@ -112,6 +115,103 @@ CROSS JOIN main.plant_care pc;
 
 # sakila data
 ## Ingestion
+- Populate data:
+``` bash
+  duckdb sakila.duckdb < data/01_load_sakila.sql
+```
+
+- Open interactive shell to inspect:
+``` bash
+duckdb -ui sakila.duckdb
+```
+
+## Working on the sakila data in the ui
+### Inspect base tables
+Confirm tables and sample rows before joining.
+Look at source tables to verify columns and data.
+
+```sql
+SELECT * FROM main.film;
+SELECT * FROM main.film_actor;
+SELECT * FROM main.actor;
+```
+### Actor → film_id (LEFT JOIN actor → film_actor)
+List actors and the film_id(s) they've acted in; keep actors with no films.
+Start with actors; attach any matching film_id from the bridge table. Missing matches => NULL.
+
+```sql
+SELECT
+  a.actor_id,
+  a.first_name,
+  a.last_name,
+  fa.film_id
+FROM main.actor a
+LEFT JOIN main.film_actor fa
+  ON fa.actor_id = a.actor_id;
+```
+
+### Actor → film title (chain LEFT JOIN: actor → film_actor → film)
+- Purpose: show actor names with movie titles; preserve actors who have no films.
+SQL:
+```sql
+SELECT
+  a.first_name,
+  a.last_name,
+  f.title
+FROM main.actor a
+LEFT JOIN main.film_actor fa
+  ON fa.actor_id = a.actor_id
+LEFT JOIN main.film f
+  ON f.film_id = fa.film_id;
+```
+Plain: film_actor connects actor → film; using LEFT JOIN twice keeps all actors in the result.
+
+
+### Film → category (corrected)
+- Purpose: show film titles with their category names (only films that have categories if INNER JOIN).
+Correct SQL:
+```sql
+SELECT
+  f.title,
+  c.name AS category
+FROM main.film_category fc
+INNER JOIN main.category c ON fc.category_id = c.category_id
+INNER JOIN main.film f ON f.film_id = fc.film_id;
+```
+Plain: film_category is the association table linking films and categories; use its columns in ON clauses.
+
+
+### Avoid incorrect ON clauses / CROSS JOIN replacements
+- Problem in source: `INNER JOIN main.category c ON category_id;` is invalid (ON must compare two columns).
+- If you intended a Cartesian product (rare), use CROSS JOIN explicitly:
+```sql
+SELECT COUNT(*) FROM main.film f CROSS JOIN main.category c;
+```
+Plain: Explicitly choose CROSS JOIN for Cartesian product; otherwise always provide a proper ON condition.
+
+### Staff → address → city → country (chain of LEFT JOINs)
+- Purpose: build full staff address info while keeping all staff rows.
+SQL:
+```sql
+SELECT
+  s.first_name,
+  s.last_name,
+  a.address,
+  c.city,
+  ct.country
+FROM main.staff s
+LEFT JOIN main.address a ON s.address_id = a.address_id
+LEFT JOIN main.city c ON c.city_id = a.city_id
+LEFT JOIN main.country ct ON ct.country_id = c.country_id;
+```
+Plain: Chain the joins from staff → address → city → country; LEFT JOIN keeps staff even if some downstream data is missing.
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------
 
 ## JOINS vs SET OPERATIONS
 ```sql

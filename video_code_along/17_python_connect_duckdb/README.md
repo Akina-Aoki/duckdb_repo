@@ -1,5 +1,5 @@
 # Setting up the this course lecture 
-Create a virtual environment 
+Create a virtual environment **RUN THIS UNDER THE MAIN ROOT REPO**
 ``` 
 uv init
 ```
