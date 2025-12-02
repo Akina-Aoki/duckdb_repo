@@ -3,8 +3,8 @@ This document walks through the two SQL files in this folder:
 - `sql/01_generate_data.sql` - creates the plants dataset and inserts sample rows
 - `sql/02_joins.sql` - demonstrates different JOIN types using the sample data
 
-## plant data
-### Ingestion
+# plant data
+## Ingestion
 1. Create a DuckDB file and run the generator SQL:
 ```bash
 duckdb data/plants.duckdb < sql/01_generate_data.sql
@@ -38,21 +38,13 @@ SELECT p.plant_id, p.plant_name, p.type, pc.water_schedule, pc.sunlight
 FROM main.plants p
 LEFT JOIN main.plant_care pc ON p.plant_id = pc.plant_id;
 ```
-#### Identify the Anchor (FROM)
-Start with main.plants because this is the primary dataset.
-Rule: The table you want to keep complete goes first.
+| Step                                   | Concept                    | Operational Intent                                                                      | Key Insight                                               |
+| -------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **1. Identify the Anchor (FROM)**      | `main.plants`              | Position as the primary dataset in the pipeline.                                        | The “keep-everything” table always sits left.             |
+| **2. Identify the Enrichment (JOIN)**  | `main.plant_care`          | Supplement the anchor with value-adding attributes such as watering and sunlight needs. | Enrichment tables *extend*, they don’t replace.           |
+| **3. Determine Direction (LEFT JOIN)** | `LEFT JOIN`                | Preserve all rows from the anchor; append matches from the enrichment layer.            | Missing care info surfaces as `NULL`, not missing plants. |
+| **4. Establish the Link (ON)**         | `p.plant_id = pc.plant_id` | Bind rows using a shared primary key.                                                   | Ensures accurate, row-level alignment across entities.    |
 
-#### Identify the Enrichment (JOIN)
-Select main.plant_care as the secondary table.
-Purpose: To fetch additional attributes (water/sunlight) corresponding to the anchor.
-
-#### Determine Direction (LEFT)
-Use LEFT JOIN to prioritize the Anchor table.
-Logic: "If a plant has no care instruction, keep the plant and show NULL for care. Do not delete the plant."
-
-#### Establish the Link (ON)
-Map the relationship using the shared Primary Key (plant_id).
-Mechanism: p.plant_id = pc.plant_id ensures data from the right table attaches to the correct row in the left table.
 
 
 ### 2) RIGHT JOIN (plants RIGHT JOIN plant_care)
@@ -62,22 +54,12 @@ SELECT p.plant_id, p.plant_name, p.type, pc.water_schedule, pc.sunlight
 FROM main.plants p
 RIGHT JOIN main.plant_care pc ON p.plant_id = pc.plant_id;
 ```
-#### Identify the Anchor (The Right Side)
-Treat main.plant_care (the table after JOIN) as the primary dataset.
-Rule: In a Right Join, the table listed second is the one you keep complete.
-
-#### Identify the Lookup (The Left Side)
-Use main.plants (the table after FROM) merely to look up names.
-Purpose: To see if you can find a name for the care instructions in your list.
-
-#### Determine Direction (RIGHT)
-Use RIGHT JOIN to prioritize the plant_care table.
-Logic: "I want to see every single care schedule I have on file. If a schedule exists for a Plant ID that isn't in my plants table (an 'orphan' record), keep the schedule and just show NULL for the plant name."
-
-#### Establish the Link (ON)
-Map the relationship using the shared Primary Key (plant_id).
-
-Mechanism: p.plant_id = pc.plant_id connects the two, but the "Right" table controls which rows stay.
+| Step                                    | Concept                    | Operational Intent                                            | Key Insight                                          |
+| --------------------------------------- | -------------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| **1. Identify the Anchor (Right Side)** | `main.plant_care`          | Treat the JOIN-second table as the "must-keep-all" dataset.   | In RIGHT JOINs, completeness flows from the right.   |
+| **2. Identify the Lookup (Left Side)**  | `main.plants`              | Use only to fetch matching names for existing care schedules. | Acts as a reference table, not a preserved one.      |
+| **3. Determine Direction (RIGHT JOIN)** | `RIGHT JOIN`               | Keep all care schedules—even those without matching plants.   | Orphan care entries surface with `NULL` plant names. |
+| **4. Establish the Link (ON)**          | `p.plant_id = pc.plant_id` | Bind rows through the shared primary k                        |                                                      |
 
 ### 3) INNER JOIN (only matched rows)
 
@@ -86,25 +68,13 @@ SELECT p.plant_id, p.plant_name, p.type, pc.water_schedule, pc.sunlight
 FROM main.plants p
 INNER JOIN main.plant_care pc ON p.plant_id = pc.plant_id;
 ```
-#### Identify the Goal (The Intersection)
-You only want data where both pieces of information exist.
-Rule: "No unmatched data allowed."
+| Step                                    | Concept                           | Operational Intent                                                  | Strategic Insight                                                        |
+| --------------------------------------- | --------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **1. Identify the Goal (Intersection)** | High-integrity dataset            | Deliver only rows where both entities have validated relationships. | Zero tolerance for incomplete or orphaned records.                       |
+| **2. Select the Tables**                | `main.plants` + `main.plant_care` | Combine anchor + enrichment, with order not impacting result.       | INNER JOIN is direction-agnostic.                                        |
+| **3. Determine Direction (INNER)**      | `INNER JOIN`                      | Enforce strict match-filtering across both domains.                 | Non-matching rows are automatically excluded from downstream visibility. |
+| **4. Establish the Link (ON)**          | `p.plant_id = pc.plant_id`        | Apply the primary-key match constraint.                             | Only rows satisfying the join condition move forward in the pipeline.    |
 
-#### Select the Tables
-Start with main.plants (Anchor) and join main.plant_care (Secondary).
-
-Note: In an Inner Join, the order of tables technically doesn't matter for the final result.
-
-#### Determine Direction (INNER)
-Use INNER JOIN to strictly filter the results.
-
-Logic: "If a plant has no care instructions, hide it. If a care instruction has no matching plant, hide it. Only give me the rows that are perfect matches."
-
-#### Establish the Link (ON)
-
-Map the relationship using the shared Primary Key (plant_id).
-
-Mechanism: p.plant_id = pc.plant_id acts as the filter. Rows are only kept if this condition is true.
 
 ### 4) FULL JOIN (all rows from both sides, matching where possible)
 
@@ -114,24 +84,12 @@ FROM main.plants p
 FULL JOIN main.plant_care pc ON p.plant_id = pc.plant_id;
 ```
 
-#### Identify the Scope (The Whole Picture)
-You want to retain all data from both tables, regardless of whether they match.
-Rule: "Leave no row behind."
-
-#### Treat Both Tables as Anchors
-main.plants and main.plant_care are treated as equally important.
-
-Note: The order implies column arrangement, but not data filtration.
-
-#### Determine Direction (FULL)
-Use FULL JOIN (or FULL OUTER JOIN) to combine the results of both a Left and Right join.
-
-Logic: "Show me the perfect matches, PLUS the plants with no care info, PLUS the care info with no plants. I want to see everything, including the 'orphans' on both sides."
-
-#### Establish the Link (ON)
-Map the relationship using the shared Primary Key (plant_id).
-
-Mechanism: If a match is found, join them. If a row in either table has no match, display it anyway and fill the missing side with NULL.
+| Step                                      | Concept                              | Operational Intent                      | Strategic Insight                                        |
+| ----------------------------------------- | ------------------------------------ | --------------------------------------- | -------------------------------------------------------- |
+| **1. Identify the Scope (Whole Picture)** | Complete dataset across both domains | Retain every row—matched or unmatched.  | Full visibility → zero data loss.                        |
+| **2. Treat Both Tables as Anchors**       | `main.plants` + `main.plant_care`    | Elevate both tables to equal priority.  | Order impacts layout, not filtering behavior.            |
+| **3. Determine Direction (FULL JOIN)**    | `FULL JOIN` / `FULL OUTER JOIN`      | Merge all matches plus all non-matches. | Functionally a union of LEFT + RIGHT join outputs.       |
+| **4. Establish the Link (ON)**            | `p.plant_id = pc.plant_id`           | Align rows on shared primary key.       | Missing matches surface as `NULL` values on either side. |
 
 
 ### 5) CROSS JOIN
@@ -142,18 +100,19 @@ FROM main.plants p
 CROSS JOIN main.plant_care pc;
 ```
 
-#### Identify the Goal 
-You want to create every possible combination of rows.Rule: "Pair every single plant with every single care instruction, regardless of whether they belong together."Select the Tablesmain.plants and main.plant_care.
+| Step                                | Concept                           | Operational Intent                                          | Strategic Insight                                   |
+| ----------------------------------- | --------------------------------- | ----------------------------------------------------------- | --------------------------------------------------- |
+| **1. Identify the Goal**            | Exhaustive combination generation | Produce every possible pairing of plant × care instruction. | This is a brute-force matrix expansion.             |
+| **2. Select the Tables**            | `main.plants` + `main.plant_care` | Feed both datasets into the combinatorial engine.           | Content is not validated for relevance—only volume. |
+| **3. Determine Direction (CROSS)**  | `CROSS JOIN`                      | Generate a Cartesian product across both sides.             | Maximizes coverage, not precision.                  |
+| **4. Drop the Link (No ON Clause)** | No join condition                 | Skip relational logic entirely; no key alignment.           | Row count becomes `rows_left × rows_right`.         |
 
-#### Determine Direction (CROSS)
-Use CROSS JOIN (Cartesian Product)
-Logic: This is not a "match"; it is a "mix-and-match." It forces every row on the left to pair with every row on the right.
-
-#### Drop the Link (NO ON Clause)Crucial Difference:
-Unlike all other joins, you do not write ON p.plant_id = ....Mechanism: There is no condition. If you have 10 plants and 10 care instructions, you will get 100 rows ($10 \times 10$) in your result.
 
 --------------------------------------------------------------------------------------------------------------------
-# Study Guide
+
+# sakila data
+## Ingestion
+
 ## JOINS vs SET OPERATIONS
 ```sql
 INNER JOIN  → overlap only  
