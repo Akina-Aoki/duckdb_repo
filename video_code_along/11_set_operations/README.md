@@ -130,7 +130,7 @@ duckdb -ui sakila.duckdb
 ```
 
 ## Exercise highlights
-4) Top 10 customers by number of rentals
+### 4) Top 10 customers by number of rentals
 - Why: join customer → rental, group by customer, count rentals and sort. Shows most active customers.
 ```sql
 SELECT
@@ -152,7 +152,7 @@ LIMIT
 ```
 - Notes: Use COUNT(r.rental_id) to count only actual rental rows.
 
-5) List all customers and the films they rented (multi-join)
+### 5) List all customers and the films they rented (multi-join)
 - Why: demonstrates joining across multiple foreign keys: customer → rental → inventory → film to get titles per rental.
 ```sql
 SELECT
@@ -173,7 +173,7 @@ ORDER BY
 ```
 - Notes: If you only want distinct customer–film pairs, add DISTINCT f.film_id, f.title or GROUP BY those columns.
 
-6) Top 5 most rented films
+### 6) Top 5 most rented films
 - Why: join film → inventory → rental, then aggregate rentals per film to rank them.
 ```sql
 SELECT
@@ -188,7 +188,7 @@ LIMIT 5;
 ```
 - Notes: This counts each rental row (rental_id) — multiple inventory copies of the same film are aggregated correctly by grouping by film_id.
 
-7) Cities and countries where customers live (with counts)
+### 7) Cities and countries where customers live (with counts)
 - Why: follow foreign keys customer → address → city → country to get location info and counts per city.
 ```sql
 -- Distinct city/country pairs
@@ -215,13 +215,7 @@ ORDER BY customer_count DESC;
 ```
 - Notes: The first query lists unique locations; the second ranks cities by number of customers.
 
-
-
-
-
 ## References
-- [SQL Set Operations]: https://www.youtube.com/watch?v=LUSPRn2zxSo
-
-- [SQLITE Database in Duckdb]: https://motherduck.com/blog/analyze-sqlite-databases-duckdb/
-
-- [Set Operations Duckdb]: https://duckdb.org/docs/stable/sql/query_syntax/setops
+- [SQL Set Operations](https://www.youtube.com/watch?v=LUSPRn2zxSo)
+- [SQLITE Database in Duckdb](https://motherduck.com/blog/analyze-sqlite-databases-duckdb/)
+- [Set Operations DuckDB](https://duckdb.org/docs/stable/sql/query_syntax/setops)
