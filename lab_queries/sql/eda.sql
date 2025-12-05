@@ -213,13 +213,80 @@ LIMIT 10;
 ============================================================================================================*/
 
 /*
-1) Business — Top 10 revenue-generating films
+f.1) Business — Top 10 revenue-generating films
 Why: Identify star content to promote or license.
 Tables/cols: payment -> rental -> inventory -> film
 Plot: bar chart of revenue by film. Complexity: multiple payments per rental possible; group carefully.
 */
 
-SELECT f.film_id, f.title, SUM(p.amount) AS revenue
+/* 1.1 Start with understanding the base tables*/
+-- a) Look at film
+SELECT 
+  film_id,
+  title,
+  rental_rate,
+  rental_duration
+FROM film
+LIMIT 10;
+
+-- b) Look at payments
+SELECT
+  payment_id, 
+  rental_id, 
+  amount
+FROM payment
+LIMIT 10;
+
+-- c) Understand how rentals connect
+SELECT 
+rental_id, 
+inventory_id, 
+customer_id
+FROM rental
+LIMIT 10;
+
+-- d) Understand inventory → film mapping
+SELECT inventory_id, film_id
+FROM inventory
+LIMIT 10;
+
+
+/* 1.2 Join step-by-step (one relationship at a time)
+This is the beginner-friendly diagnostic approach.
+Step 1: payment → rental */
+SELECT
+  p.payment_id,
+  p.amount,
+  r.rental_id,
+  r.inventory_id
+FROM payment p
+INNER JOIN rental r ON p.rental_id = r.rental_id
+LIMIT 10;
+
+
+-- Step 2: bring in film through inventory
+SELECT
+  p.payment_id,
+  p.amount,
+  r.rental_id,
+  i.inventory_id,
+  f.film_id,
+  f.title
+FROM payment p
+INNER JOIN rental r ON p.rental_id = r.rental_id
+INNER JOIN inventory i ON r.inventory_id = i.inventory_id
+INNER JOIN film f ON i.film_id = f.film_id
+LIMIT 10;
+
+
+/*3. Add aggregation and ranking (final KPI)
+Once the join path is validated, plug in business logic.
+*/
+-- Final query for this question f1
+SELECT 
+  f.film_id,
+  f.title, 
+  ROUND(SUM(p.amount),2) AS revenue
 FROM payment p
 JOIN rental r ON p.rental_id = r.rental_id
 JOIN inventory i ON r.inventory_id = i.inventory_id
@@ -227,8 +294,6 @@ JOIN film f ON i.film_id = f.film_id
 GROUP BY f.film_id, f.title
 ORDER BY revenue DESC
 LIMIT 10;
-
-
 
 /*
 2) Business — Revenue trend by month
