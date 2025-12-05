@@ -211,3 +211,64 @@ LIMIT 10;
  f) Now it's time for you to choose your own question to explore the sakila database!
  Write down 3-5 questions you want to answer and then answer them using pandas and duckdb.
 ============================================================================================================*/
+
+/*
+1) Business — Top 10 revenue-generating films
+Why: Identify star content to promote or license.
+Tables/cols: payment -> rental -> inventory -> film
+Plot: bar chart of revenue by film. Complexity: multiple payments per rental possible; group carefully.
+*/
+
+SELECT f.film_id, f.title, SUM(p.amount) AS revenue
+FROM payment p
+JOIN rental r ON p.rental_id = r.rental_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+GROUP BY f.film_id, f.title
+ORDER BY revenue DESC
+LIMIT 10;
+
+
+
+/*
+2) Business — Revenue trend by month
+Why: Understand seasonality and revenue growth.
+Tables/cols: payment(payment_date, amount), rental(rental_date, return_date) optionally join inventory/film
+SQL:
+-- monthly rental revenue
+SELECT DATE_TRUNC('month', payment_date) AS month, SUM(amount) AS revenue
+FROM payment
+GROUP BY month
+ORDER BY month;
+Pandas/plot: line chart (month vs revenue). Complexity: need to decide which payments correspond to which rentals (payment.rental_id).
+*/
+
+
+/*
+3) Marketing — Popular film categories/genres
+Why: Target marketing and acquisitions.
+Tables/cols: film -> film_category -> category
+SQL:
+SELECT c.category_id, c.name, COUNT(*) AS film_count
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+GROUP BY c.category_id, c.name
+ORDER BY film_count DESC;
+Plot: bar chart; pie for distribution. Complexity: films can be in multiple categories depending on dataset.
+*/
+
+
+/*
+4) Customer — Churn / activity: customers who haven't rented in X months
+Why: Target re-engagement campaigns.
+Tables/cols: customer, rental(rental_date)
+SQL:
+-- customers with last rental date
+SELECT c.customer_id, c.first_name, c.last_name, MAX(r.rental_date) AS last_rental
+FROM customer c
+LEFT JOIN rental r ON c.customer_id = r.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING MAX(r.rental_date) < DATE('now') - INTERVAL '6 months'
+ORDER BY last_rental;
+Pandas/plot: count of churned customers by month they became inactive. Complexity: define churn window. */
