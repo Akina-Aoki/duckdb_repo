@@ -1,5 +1,5 @@
 # Workflow: Loading Sakila from SQLite into DuckDB Using DLT
-
+```bash
 19_dlt/                         # ETL workspace for loading Sakila SQLite → DuckDB using DLT
 │
 ├── data/                       # Source + destination databases (all storage assets live here)
@@ -16,6 +16,8 @@
 │
 └── test_sakila.ipynb           # Jupyter notebook for validation & EDA
                                  # Connects to data/sakila.duckdb and inspects loaded tables
+``` 
+
 
 ## Terminal Commands
 This end-to-end workflow provisions a local DuckDB warehouse from a SQLite source using dlt.
