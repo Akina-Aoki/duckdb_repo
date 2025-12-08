@@ -347,6 +347,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+duckdb = [
+    { name = "duckdb" },
+]
 sql-database = [
     { name = "sqlalchemy" },
 ]
@@ -356,14 +359,18 @@ name = "dlt-sakila"
 version = "0.1.0"
 source = { virtual = "video_code_along/19_dlt" }
 dependencies = [
-    { name = "dlt", extra = ["sql-database"] },
+    { name = "dlt", extra = ["duckdb", "sql-database"] },
     { name = "ipykernel" },
+    { name = "numpy" },
+    { name = "pandas" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "dlt", extras = ["sql-database"], specifier = ">=1.19.1" },
+    { name = "dlt", extras = ["duckdb", "sql-database"], specifier = ">=1.19.1" },
     { name = "ipykernel", specifier = ">=7.1.0" },
+    { name = "numpy", specifier = ">=2.3.5" },
+    { name = "pandas", specifier = ">=2.3.3" },
 ]
 
 [[package]]

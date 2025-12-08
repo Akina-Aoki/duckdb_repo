@@ -2,9 +2,10 @@ import dlt
 from dlt.sources.sql_database import sql_database
 from pathlib import Path
 
+# define source reading from SQLite database
 DATA_PATH = Path(__file__).parent / "data"
-SQLITE_PATH = Path(__file__).parent / "sqlite-sakila.db"
-DUCKDB_PATH = Path(__file__).parent / "sakila.duckdb"
+SQLITE_PATH = DATA_PATH / "sqlite-sakila.db"
+DUCKDB_PATH = DATA_PATH / "sakila.duckdb"
 
 
 source = sql_database(credentials=f"sqlite:///{SQLITE_PATH}", schema="main")
