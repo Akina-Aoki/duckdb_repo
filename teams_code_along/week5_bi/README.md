@@ -1,5 +1,5 @@
 # Data Pipeline Code Along - Week 5: BI Dashboard
-![Figure 1](./data_pipeline_example.png)
+![Figure 1](./data/data_pipeline_example.png)
 
 # Worklflow Summary (Guide to VG)
 **NOTE:** The final dashboard from the lecture is available in this repo folder called `20_dashboard_lecture`.
