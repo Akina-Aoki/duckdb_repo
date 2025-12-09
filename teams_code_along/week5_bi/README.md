@@ -59,5 +59,79 @@ jobsearch.api.jobtechdev.se/search
 - Finally, we can use orchestration tools to automate the data pipeline. We need to schedule the data pipeline to run at specific intervals (daily, weekly, etc) because the data is constantly changing and the whole process needs to be repeated to keep the data up-to-date.
 
 - If I have multiple data pipelines, I can use orchestration tools like Dagster or Airflow to manage and schedule the pipelines.
-
+git
 - These tools allow us to define dependencies between pipelines and ensure that they run in the correct order.
+
+
+# Worklflow Summary (Guide to VG)
+
+1. Create a dashboard folder in the folder (choice)
+CTRL + SHIFT + P
+Create Evidence project, choose the DASHBOARD  folder.
+Default files will be produced.
+
+
+2. In the connection.yaml file, change to this
+```
+# This file was automatically generated
+name: sakila
+type: duckdb
+options:
+  filename: sakila.duckdb
+```
+
+
+3. In the .gitignore, add `.evidence`
+Save the file.
+
+
+4. Install different packages
+Go to the path you want to install in. 
+This case, it's in my week5_bi/dashboard(main)
+`npm install`
+
+
+5. Add data sources
+There are 2 subfolder (pages, sources)
+Create a `sakila` folder under sources.
+Copy the available connection.yaml under the sakila folder.
+Double check if I have edited the connection.yaml.
+
+Connection.yaml and sakila should always be in the same folder.
+
+6. Create the sql files that I will use to show in the evidence dashboard.
+In this case, its the `film_actor.sql` and `actor.sql`
+
+
+7. try running `npm run dev` to see if everything is working fine.
+If everything is fine, I can see the dashboard running at `localhost:3000` and
+see the different pages I have created under the pages folder.
+
+
+8. Visualizations: Under then pages folder in the sakila.md, I can create different markdown files to show different visualizations.
+```
+```sql film_ratings
+ SELECT
+    rating,
+    COUNT(*) AS number_film
+FROM sakila.film
+GROUP BY rating
+```
+
+<BarChart
+    data = {film_ratings}
+    title="Number of Films by Rating"
+    x = rating
+    y = number_film
+/>  
+```
+
+
+
+
+
+
+
+
+
+
