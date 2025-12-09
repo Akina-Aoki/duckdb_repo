@@ -1,0 +1,1 @@
+FROM staging.film;
