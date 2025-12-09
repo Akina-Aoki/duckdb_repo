@@ -1,4 +1,6 @@
 # Evidence Template Project
+[![YouTube Tutorial Video](https://img.youtube.com/vi/8jMIRtGwReY/0.jpg)](https://www.youtube.com/watch?v=8jMIRtGwReY)
+**Video by AIgeneer**
 
 ## Using Codespaces
 

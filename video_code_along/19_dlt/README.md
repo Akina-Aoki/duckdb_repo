@@ -1,4 +1,8 @@
 # Workflow: Loading Sakila from SQLite into DuckDB Using DLT
+
+[![YouTube Video](https://img.youtube.com/vi/WuC9cOicRUE/0.jpg)](https://www.youtube.com/watch?v=WuC9cOicRUE)
+**Video by AIgeneer**
+
 ```bash
 19_dlt/                         # ETL workspace for loading Sakila SQLite → DuckDB using DLT
 │

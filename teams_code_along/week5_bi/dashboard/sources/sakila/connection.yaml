@@ -1,5 +1,5 @@
 # This file was automatically generated
-name: sakila
+name: sakila  # make sure to set a adjusted with the database name
 type: duckdb
 options:
-  filename: sakila.duckdb
+  filename: sakila.duckdb   # make sure it matches the database file name

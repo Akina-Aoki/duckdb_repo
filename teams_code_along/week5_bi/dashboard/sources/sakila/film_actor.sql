@@ -1,5 +1,5 @@
 SELECT
-    a.first_name , ' ', a.last_name AS actor,
+    a.first_name || ' ' || a.last_name AS actor_name,
     f.title AS film,
     f.rating
 FROM staging.actor a
