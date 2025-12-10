@@ -58,7 +58,7 @@ options:
 Save the file.
 
 
-4. Install different packages
+## 4. Install different packages
 Go to the path you want to install in. 
 This case, it's in my week5_bi/dashboard(main)
 `npm install`
