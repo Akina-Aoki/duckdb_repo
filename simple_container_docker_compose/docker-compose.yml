@@ -1,0 +1,6 @@
+# Specify the number of containers to be run
+services:        
+  python-app:   # Service name
+    build: .    # dockerfile location
+    volumes:    # data storage location after the container is removed
+      - .:/app   # mount current directory to /app in container
